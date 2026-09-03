@@ -2,7 +2,7 @@
 
 Pimoroni Tiny 2040を使用した、拡張可能なUSB/DIN MIDIフットペダルのファームウェアプロジェクトです。
 
-現在はプロジェクト構成を設計している段階です。ビルド設定とファームウェア実装は今後追加します。
+現在はビルド環境と最小FreeRTOSファームウェアまで実装済みです。
 
 ## 想定ハードウェア
 
@@ -17,16 +17,57 @@ Pimoroni Tiny 2040を使用した、拡張可能なUSB/DIN MIDIフットペダ�
 ## ソフトウェア構成
 
 - C
-- Raspberry Pi Pico SDK
-- FreeRTOS（単一コア構成を予定）
+- Raspberry Pi Pico SDK 2.2.0
+- FreeRTOS Kernel V11.3.0（単一コア構成）
 - TinyUSB
-- Pico SDKとFreeRTOS KernelはGit submoduleとして管理予定
+- Pico SDKとFreeRTOS KernelはGit submoduleとして管理
+
+## セットアップ
+
+必要なツールは以下のとおりです。
+
+- Git
+- CMake 3.20以降
+- Ninja
+- Arm GNU Toolchain (`arm-none-eabi-gcc`)
+- picotool
+
+Windowsでは、Raspberry Pi Pico VS Code拡張が管理するツールを利用できます。
+
+リポジトリを取得した後、submoduleを初期化します。
+
+```powershell
+git submodule update --init --recursive
+```
+
+## ビルド
+
+Raspberry Pi Pico VS Code拡張のツールが`%USERPROFILE%\.pico-sdk`にあるWindows環境では、補助スクリプトがツールを自動検出します。
+
+```powershell
+.\tools\build.ps1
+```
+
+Releaseビルドは次のように実行します。
+
+```powershell
+.\tools\build.ps1 -Configuration Release
+```
+
+NinjaとArm GNU ToolchainがPATHに設定済みの環境では、CMake Presetを直接利用できます。
+
+```powershell
+cmake --preset debug
+cmake --build --preset debug
+```
+
+生成物は`build/debug/src/`または`build/release/src/`に出力されます。Tiny 2040へ書き込むファイルは`usb_midi_pedal.uf2`です。
 
 ## ディレクトリ構成
 
 ```text
 usb_midi_pedal/
-├─ boards/                  Pico SDK向けボード定義
+├─ boards/                  必要になった場合の独自ボード定義
 ├─ cmake/                   CMakeインポートおよび補助設定
 ├─ config/                  FreeRTOS、TinyUSB、アプリ設定
 ├─ docs/                    設計資料と設計判断の記録
@@ -74,9 +115,10 @@ lib ──×────→ app / drivers / FreeRTOS / Pico SDK
 ## 現在の状態
 
 - [x] 基本ディレクトリ構成
-- [ ] Pico SDK submodule
-- [ ] FreeRTOS Kernel submodule
-- [ ] CMakeビルド設定
-- [ ] ボードおよびピン定義
-- [ ] 最小FreeRTOS起動
+- [x] Pico SDK submodule
+- [x] FreeRTOS Kernel submodule
+- [x] CMakeビルド設定
+- [x] Pimoroni Tiny 2040公式ボード定義の選択
+- [x] 最小FreeRTOS起動とRGB LED点滅タスク
+- [ ] プロジェクト固有のピン定義
 - [ ] USB MIDI実装

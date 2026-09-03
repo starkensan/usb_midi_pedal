@@ -63,54 +63,12 @@ cmake --build --preset debug
 
 生成物は`build/debug/src/`または`build/release/src/`に出力されます。Tiny 2040へ書き込むファイルは`usb_midi_pedal.uf2`です。
 
-## ディレクトリ構成
+## ドキュメント
 
-```text
-usb_midi_pedal/
-├─ boards/                  必要になった場合の独自ボード定義
-├─ cmake/                   CMakeインポートおよび補助設定
-├─ config/                  FreeRTOS、TinyUSB、アプリ設定
-├─ docs/                    設計資料と設計判断の記録
-│  └─ decisions/
-├─ external/                Git submoduleなどの外部依存
-├─ src/
-│  ├─ app/                  製品固有処理、FreeRTOSタスク、状態管理
-│  │  └─ tasks/
-│  ├─ board/                基板固有の初期化とピン設定
-│  ├─ drivers/              Pico SDKおよびデバイス依存処理
-│  │  ├─ din_midi/
-│  │  ├─ display/
-│  │  ├─ expression/
-│  │  ├─ flash_storage/
-│  │  ├─ footswitch/
-│  │  ├─ rgb_led/
-│  │  └─ usb_midi/
-│  └─ lib/                  ハードウェア非依存の再利用可能な処理
-│     ├─ graphics/
-│     ├─ input/
-│     ├─ midi/
-│     └─ preset/
-├─ tests/                   PC上で実行する単体テスト
-│  ├─ lib/
-│  └─ mocks/
-└─ tools/                   開発用補助ツール
-```
+設計仕様と設計判断は[ドキュメント一覧](docs/README.md)にまとめています。
 
-## 依存関係の方針
-
-```text
-app ────────→ lib
- │
- └─────────→ drivers ─────→ Pico SDK / TinyUSB
-
-drivers ───→ libのデータ型
-lib ──×────→ app / drivers / FreeRTOS / Pico SDK
-```
-
-- `app`はFreeRTOSタスクや製品全体の振る舞いを担当します。
-- `lib`はハードウェアに依存せず、PC上で単体テスト可能にします。
-- `drivers`はGPIO、ADC、I2C、UART、USB、flashなどを担当します。
-- `external`は外部依存専用とし、プロジェクト内部の`lib`と区別します。
+- [アーキテクチャ](docs/architecture.md)：ディレクトリ構成、各層の責務、依存関係
+- 今後追加予定：ハードウェア、ピン割り当て、RTOS、MIDI、プリセット、画面設計
 
 ## 現在の状態
 

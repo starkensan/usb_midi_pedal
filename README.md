@@ -17,7 +17,7 @@ Pimoroni Tiny 2040を使用した、拡張可能なUSB/DIN MIDIフットペダ�
 ## ソフトウェア構成
 
 - C
-- Raspberry Pi Pico SDK 2.2.0
+- Raspberry Pi Pico SDK 2.3.0
 - FreeRTOS Kernel V11.3.0（単一コア構成）
 - TinyUSB
 - Pico SDKとFreeRTOS KernelはGit submoduleとして管理

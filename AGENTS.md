@@ -17,6 +17,7 @@
 - `README.md`：プロジェクト概要、セットアップ、ビルド方法
 - `docs/README.md`：設計ドキュメントの一覧と記述方針
 - `docs/architecture.md`：ディレクトリ構成、各層の責務、依存関係
+- `docs/rules/README.md`：実装、検証、ドキュメント、GitHub運用の作業ルール
 
 実装と仕様が変わる場合は、関連するドキュメントも同時に更新してください。
 
@@ -30,74 +31,59 @@
 - Pico SDK APIは原則として`drivers`と`board`の内部に閉じ込めてください。
 - Pico SDKとFreeRTOS Kernelは`external/`のGit submoduleとして管理し、直接編集しないでください。
 
-## 実装規約
+## 作業ルール
 
-- C11で実装し、コンパイラ警告を増やさないでください。
-- 動的メモリ割り当てを安易に追加せず、組み込み環境でのメモリ使用量を明確にしてください。
-- FreeRTOSオブジェクトは、既存方針に合わせて可能な限り静的に確保してください。
-- 割り込み処理ではブロッキング処理を避け、ISR用FreeRTOS APIの制約を守ってください。
-- ハードウェア依存処理と、PC上で単体テスト可能なロジックを分離してください。
+新たな変更作業は、次のフローに従って進めてください。
 
-## ビルドと検証
-
-WindowsでRaspberry Pi Pico VS Code拡張のツールを使用する場合は、次を実行してください。
-
-```powershell
-.\tools\build.ps1
+```mermaid
+flowchart TD
+    start([作業開始]) --> select[作業内容を確認]
+    select --> rules[AGENTS.mdの対応表から\n適用ルールを確認]
+    rules --> change{リポジトリを\n変更するか}
+    change -- いいえ --> report([結果を報告])
+    change -- はい --> issue_permission{Issue作成について\nユーザー確認済みか}
+    issue_permission -- いいえ --> ask_issue[ユーザーへ確認]
+    ask_issue --> issue_permission
+    issue_permission -- はい --> issue[GitHub Issueを作成]
+    issue --> branch[origin/developから\nfeature-xxxxブランチを作成]
+    branch --> design_needed{新機能・新モジュール・\n公開データ型を実装するか}
+    design_needed -- はい --> design[設計ドキュメントを\n作成または更新]
+    design --> work[実装・設定・文書を変更]
+    design_needed -- いいえ --> work
+    work --> source{ソースコードを\n変更したか}
+    source -- はい --> verify[Debugビルドと\nすべてのテストを実行]
+    source -- いいえ --> review[差分と適用ルールを確認]
+    verify --> pass{ビルドとテストが\n成功したか}
+    pass -- いいえ --> fix[原因を修正]
+    fix --> verify
+    pass -- はい --> review
+    review --> commit_permission{コミットを\n依頼されたか}
+    commit_permission -- いいえ --> report
+    commit_permission -- はい --> commit[refs #Issue番号付きで\nコミット]
+    commit --> remote_permission{push・PR作成について\nユーザー確認済みか}
+    remote_permission -- いいえ --> ask_remote[ユーザーへ確認]
+    ask_remote --> remote_permission
+    remote_permission -- はい --> push[作業ブランチをpush]
+    push --> pr[develop向けPRを作成]
+    pr --> merge[PRがdevelopへマージ]
+    merge --> close_permission{Issueクローズについて\nユーザー確認済みか}
+    close_permission -- いいえ --> ask_close[ユーザーへ確認]
+    ask_close --> close_permission
+    close_permission -- はい --> close[Issueをクローズ]
+    close --> report
 ```
 
-Releaseビルドには次を使用します。
+作業を始める前に、該当する行のルールをすべて確認してください。
 
-```powershell
-.\tools\build.ps1 -Configuration Release
-```
+| 作業内容 | 確認するルール |
+| --- | --- |
+| CまたはFreeRTOSのソースコードを変更する | [実装規約](docs/rules/implementation.md)、[ビルドと検証](docs/rules/build_and_test.md)、[ドキュメント規約](docs/rules/documentation.md)、[Git規約](docs/rules/git.md)、[GitHub IssueとPull Requestの運用](docs/rules/github.md) |
+| CMake、ビルドスクリプト、SDKやツールチェーンの設定を変更する | [ビルドと検証](docs/rules/build_and_test.md)、[Git規約](docs/rules/git.md)、[GitHub IssueとPull Requestの運用](docs/rules/github.md) |
+| 設計書、README、作業ルールなどのドキュメントを変更する | [ドキュメント規約](docs/rules/documentation.md)、[Git規約](docs/rules/git.md)、[GitHub IssueとPull Requestの運用](docs/rules/github.md) |
+| コミット、履歴の書き換え、ブランチ操作を行う | [Git規約](docs/rules/git.md)、[GitHub IssueとPull Requestの運用](docs/rules/github.md) |
+| Issue、Pull Request、pushなどGitHub上の操作を行う | [GitHub IssueとPull Requestの運用](docs/rules/github.md) |
 
-PATH設定済みの環境ではCMake Presetも利用できます。
-
-```powershell
-cmake --preset debug
-cmake --build --preset debug
-```
-
-変更後は、少なくともDebugビルドが成功することを確認してください。ビルドできない環境では、実行できなかった理由を明記してください。
-
-### コミット前の確認
-
-- ソースコードを変更した場合は、コミット前にDebugビルドを実行し、エラーなく完了することを確認してください。
-- ソースコードを変更した場合は、コミット前にプロジェクトで用意されているテストをすべて実行し、成功することを確認してください。
-- ビルドまたはテストが失敗した状態ではコミットせず、原因を修正してから再実行してください。
-- テストが未整備、または環境上の理由で実行できない場合は、確認済みとは扱わず、その理由をユーザーとIssueへ明記してください。
-- 実行したコマンドと結果は、対応するIssueへ記録してください。
-- ドキュメントのみを変更した場合、ビルドとテストは省略できます。
-
-## ドキュメント規約
-
-- 本文は日本語で記述してください。
-- ソースコード上の識別子、パス、コマンドは英語表記を使用してください。
-- 概念図、依存関係図、フロー図はMermaidで記述してください。
-- ディレクトリツリーやコマンド例は、用途に応じて`text`または言語別のコードブロックを使用してください。
-- 未決定事項を確定事項として記述しないでください。
-
-## Git規約
-
-- ユーザーから明示的に依頼された場合のみコミットしてください。
-- コミットの要約は日本語で記述してください。
-- `build:`、`docs:`、`feat:`、`fix:`などの種別を付ける場合、種別は英語、要約は日本語としてください。
-- ユーザーの変更や、作業対象外の変更を取り消さないでください。
-- 履歴の書き換えやforce pushが必要な場合は、影響を事前に説明してください。
-
-## GitHub Issue運用
-
-- リポジトリへ変更を加える作業は、着手前にGitHub Issueを作成してください。
-- Issueのタイトルと本文は日本語で記述してください。
-- Issue本文には、背景または目的、作業範囲、完了条件を記載してください。
-- Issueに対応する作業は、最新のリモート情報を取得したうえで、`origin/develop`を基点とする作業ブランチを作成してから開始してください。
-- `develop`ブランチ上で直接作業しないでください。
-- コミットメッセージの1行目の末尾には、`refs #<Issue番号>`の形式で対応するIssue番号を付けてください。
-- 例：`feat: USB MIDI送信を実装 refs #12`
-- 作業中に重要な判断や作業範囲の変更があった場合は、Issueへコメントしてください。
-- 動作確認とGitHubへの反映が完了してからIssueを閉じてください。
-- 質問への回答や読み取り専用の調査など、リポジトリを変更しない作業ではIssueを作成する必要はありません。
+複数の作業内容に該当する場合は、該当するすべてのルールを適用してください。
 
 ## プロジェクト固有スキル
 

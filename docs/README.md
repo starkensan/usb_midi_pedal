@@ -14,6 +14,7 @@
 | 作成済み | [designs/adc-selection.md](designs/adc-selection.md) | I2C ADC候補の比較とADS1015採用判断 |
 | 作成済み | [rules/README.md](rules/README.md) | 実装、検証、ドキュメント、GitHub運用の作業ルール |
 | 設計予定 | `designs/rtos-design.md` | FreeRTOSタスク、優先度、周期、Queue、スタック設計 |
+| 設計 | `designs/testing.md` | ホスト単体テスト、Unity/CMock、CTest構成 |
 | 仕様予定 | `specifications/midi-mapping.md` | フットスイッチとEXPペダルのMIDI割り当て |
 | 仕様予定 | `specifications/preset-format.md` | プリセットのデータ構造とフラッシュ保存形式 |
 | 設計予定 | `designs/display-ui.md` | 128×64 OLEDの画面構成と画面遷移 |

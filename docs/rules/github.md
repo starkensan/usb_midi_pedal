@@ -4,7 +4,14 @@
 - リポジトリへ変更を加える作業は、着手前にGitHub Issueを作成してください。
 - Issueのタイトルと本文は日本語で記述してください。
 - Issue本文には、背景または目的、作業範囲、完了条件を記載してください。
-- Issueに対応する作業は、最新のリモート情報を取得したうえで、`origin/develop`を基点とする作業ブランチを作成してから開始してください。
+- IssueおよびPull Requestの本文をCLIから渡す場合は、文字列`\n`ではなく実際の改行を使用してください。PowerShellではヒア文字列または`--body-file`を使用します。作成または更新後は、GitHub上でMarkdownの改行・見出し・箇条書きが正しく表示されることを確認してください。
+- Issueに対応する作業は、作業開始前に次のように最新の`origin/develop`を取得し、それを基点とする作業ブランチを作成してください。
+
+```powershell
+git fetch origin develop
+git switch -c feature-<issue番号>-<概要> origin/develop
+```
+
 - 1 Issueにつき1つの作業ブランチを使用してください。
 - 作業ブランチ名は、`feature-xxxx`形式の小文字kebab-caseを使用してください。
 - 例：Issue #12のUSB MIDI実装は`feature-issue-12-usb-midi`とします。
@@ -41,5 +48,5 @@
 - 確認: <!-- 実行したビルド・テスト、または省略理由 -->
 ```
 
-- IssueはPull Requestが`develop`へマージされた後に閉じてください。
+- `Closes #<Issue番号>`などのクローズキーワードは、Pull Requestのマージ先がリポジトリの既定ブランチである場合にだけ自動クローズとして機能します。本プロジェクトのPull Requestは`develop`をマージ先とするため、本文には`対応Issue: #<Issue番号>`を記載し、`develop`へのマージ後、ユーザーの確認を得てIssueを手動でクローズしてください。
 - 質問への回答や読み取り専用の調査など、リポジトリを変更しない作業ではIssueを作成する必要はありません。

@@ -1,0 +1,64 @@
+name: Close issue on develop merge
+
+on:
+  pull_request:
+    branches:
+      - develop
+    types:
+      - closed
+
+permissions:
+  issues: write
+
+jobs:
+  close-issue:
+    if: github.event.pull_request.merged == true
+    name: Close corresponding issue
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Close the issue declared in the pull request body
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = context.payload.pull_request.body ?? "";
+            const issueNumbers = [
+              ...new Set(
+                [...body.matchAll(/^\s*-\s*対応Issue:\s*#(\d+)\s*$/gmi)].map(
+                  (match) => Number(match[1]),
+                ),
+              ),
+            ];
+
+            if (issueNumbers.length === 0) {
+              core.info("対応Issueは記載されていないため、クローズしません。");
+              return;
+            }
+
+            if (issueNumbers.length !== 1) {
+              core.setFailed("対応Issueは1件だけ記載してください。");
+              return;
+            }
+
+            const issueNumber = issueNumbers[0];
+            const { data: issue } = await github.rest.issues.get({
+              ...context.repo,
+              issue_number: issueNumber,
+            });
+
+            if (issue.pull_request) {
+              core.setFailed(`対応Issue #${issueNumber} はPull Requestです。`);
+              return;
+            }
+
+            if (issue.state === "closed") {
+              core.info(`対応Issue #${issueNumber} はすでにクローズされています。`);
+              return;
+            }
+
+            await github.rest.issues.update({
+              ...context.repo,
+              issue_number: issueNumber,
+              state: "closed",
+            });
+            core.info(`対応Issue #${issueNumber} をクローズしました。`);

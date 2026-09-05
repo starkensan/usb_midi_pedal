@@ -49,5 +49,7 @@ git switch -c feature-<issue番号>-<概要> origin/develop
 - 確認: <!-- 実行したビルド・テスト、または省略理由 -->
 ```
 
-- `Closes #<Issue番号>`などのクローズキーワードは、Pull Requestのマージ先がリポジトリの既定ブランチである場合にだけ自動クローズとして機能します。本プロジェクトのPull Requestは`develop`をマージ先とするため、本文には`対応Issue: #<Issue番号>`を記載し、`develop`へのマージ後、ユーザーの確認を得てIssueを手動でクローズしてください。
+- `Closes #<Issue番号>`などのクローズキーワードは、Pull Requestのマージ先がリポジトリの既定ブランチである場合にだけ自動クローズとして機能します。本プロジェクトのPull Requestは`develop`をマージ先とし、既定ブランチの`main`はリリースブランチとして運用します。
+- `develop`へマージされたPull Requestについては、`.github/workflows/close-issue-on-develop-merge.yml`が本文の`対応Issue: #<Issue番号>`を検出し、対応するIssueを自動でクローズします。`対応Issue`は1件だけ記載してください。
+- `対応Issue`が未記載の場合、マージされずにPull Requestが閉じられた場合、または`develop`以外へマージされた場合は、Issueをクローズしません。
 - 質問への回答や読み取り専用の調査など、リポジトリを変更しない作業ではIssueを作成する必要はありません。

@@ -25,18 +25,18 @@
 ```c
 typedef enum {
     ERROR_CODE_OK = 0,
-    ERROR_CODE_INVALID_ARGUMENT,
-    ERROR_CODE_OUT_OF_RANGE,
-    ERROR_CODE_NOT_READY,
-    ERROR_CODE_IO,
-    ERROR_CODE_TIMEOUT,
-    ERROR_CODE_STORAGE,
-    ERROR_CODE_UNSUPPORTED,
+    ERROR_CODE_INVALID_ARGUMENT = -1,
+    ERROR_CODE_OUT_OF_RANGE = -2,
+    ERROR_CODE_NOT_READY = -3,
+    ERROR_CODE_IO = -4,
+    ERROR_CODE_TIMEOUT = -5,
+    ERROR_CODE_STORAGE = -6,
+    ERROR_CODE_UNSUPPORTED = -7,
 } error_code_t;
 ```
 
 - `ERROR_CODE_OK` は必ず 0 とする。
-- それ以外の値は成功以外の結果を表す。呼び出し元は個別の失敗理由を判定できる。
+- 異常を表す値はすべて負値とし、成功との判定を明確にする。呼び出し元は個別の失敗理由を判定できる。
 - 列挙値はハードウェア、Pico SDK、FreeRTOSに依存させない。
 
 ## 依存関係

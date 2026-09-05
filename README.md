@@ -67,10 +67,10 @@ cmake --build --preset debug
 
 設計仕様と設計判断は[ドキュメント一覧](docs/README.md)にまとめています。
 
-- [製品要件・仕様](docs/designs/product-requirements.md)：製品の目的、対象範囲、機能要件
-- [アーキテクチャ](docs/architecture.md)：ディレクトリ構成、各層の責務、依存関係
-- [ハードウェア仕様](docs/hardware.md)：電源、入出力回路、使用部品
-- [ピン割り当て](docs/pin_assignment.md)：Tiny 2040のGPIO、I2C、UARTの割り当て
+- [製品要件](docs/requirements/product-requirements.md)：製品の目的、対象範囲、機能要件
+- [アーキテクチャ](docs/designs/architecture.md)：ディレクトリ構成、各層の責務、依存関係
+- [ハードウェア仕様](docs/specifications/hardware.md)：電源、入出力回路、使用部品
+- [ピン割り当て](docs/specifications/pin_assignment.md)：Tiny 2040のGPIO、I2C、UARTの割り当て
 - [I2C ADC選定記録](docs/designs/adc-selection.md)：ADC候補の比較とADS1015採用理由
 - 今後追加予定：RTOS、MIDI、プリセット、画面設計
 

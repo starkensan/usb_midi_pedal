@@ -1,6 +1,6 @@
 # ドキュメント
 
-このディレクトリでは、USB MIDI Pedalの設計仕様と設計判断を管理します。
+このディレクトリでは、USB MIDI Pedalの要件、仕様、設計および開発ルールを管理します。
 
 プロジェクト概要、開発環境、ビルド手順については[ルートのREADME](../README.md)を参照してください。
 
@@ -8,17 +8,15 @@
 
 | 状態 | ファイル | 内容 |
 | --- | --- | --- |
-| 作成済み | [architecture.md](architecture.md) | `app`、`lib`、`drivers`の責務と依存関係 |
-| 作成済み | [designs/README.md](designs/README.md) | 機能・モジュールごとの設計ドキュメント |
-| 作成済み | [designs/product-requirements.md](designs/product-requirements.md) | 製品全体の要件と仕様 |
-| 作成済み | [hardware.md](hardware.md) | 電源、入出力回路、主要部品の電気仕様 |
-| 作成済み | [pin_assignment.md](pin_assignment.md) | Tiny 2040のGPIO、I2C、UARTの割り当て |
+| 要件 | [requirements/README.md](requirements/README.md) | 製品として満たす機能、用途、制約 |
+| 仕様 | [specifications/README.md](specifications/README.md) | 確定したハードウェア仕様とGPIO割り当て |
+| 設計 | [designs/README.md](designs/README.md) | アーキテクチャ、設計判断、機能・モジュールごとの設計 |
 | 作成済み | [designs/adc-selection.md](designs/adc-selection.md) | I2C ADC候補の比較とADS1015採用判断 |
 | 作成済み | [rules/README.md](rules/README.md) | 実装、検証、ドキュメント、GitHub運用の作業ルール |
-| 作成予定 | `rtos_design.md` | FreeRTOSタスク、優先度、周期、Queue、スタック設計 |
-| 作成予定 | `midi_mapping.md` | フットスイッチとEXPペダルのMIDI割り当て |
-| 作成予定 | `preset_format.md` | プリセットのデータ構造とフラッシュ保存形式 |
-| 作成予定 | `display_ui.md` | 128×64 OLEDの画面構成と画面遷移 |
+| 設計予定 | `designs/rtos-design.md` | FreeRTOSタスク、優先度、周期、Queue、スタック設計 |
+| 仕様予定 | `specifications/midi-mapping.md` | フットスイッチとEXPペダルのMIDI割り当て |
+| 仕様予定 | `specifications/preset-format.md` | プリセットのデータ構造とフラッシュ保存形式 |
+| 設計予定 | `designs/display-ui.md` | 128×64 OLEDの画面構成と画面遷移 |
 
 ## 設計判断
 

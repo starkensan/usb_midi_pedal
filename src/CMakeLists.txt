@@ -5,6 +5,8 @@ add_executable(usb_midi_pedal
 target_link_libraries(usb_midi_pedal PRIVATE
     pico_stdlib
     FreeRTOS-Kernel-Static
+    hardware_i2c
+    hardware_uart
 )
 
 target_compile_options(usb_midi_pedal PRIVATE

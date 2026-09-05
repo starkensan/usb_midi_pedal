@@ -6,6 +6,9 @@
 - 対応Issue: #15
 - 対象: Pimoroni Tiny 2040の外部GPIOと周辺回路の接続
 
+実装では、この割り当てを`src/board/board_config.h`に集約する。
+SH1106のI2Cアドレスは、ファームウェアでは`0x3C`を使用する。
+
 ## 割り当て
 
 | GPIO | RP2040機能 | 接続先 | 入出力 | 備考 |

@@ -5,6 +5,7 @@
 - [アーキテクチャ](architecture.md)
 - [I2C ADC選定記録](adc-selection.md)
 - [ボード設定設計](board-config.md)
+- [共通エラーコード設計](error-codes.md)
 - 新規ドキュメントは`<機能名またはモジュール名>.md`の形式で追加します。
 - ファイル名は小文字kebab-caseを使用します。
 - [設計ドキュメントのテンプレート](../rules/design_document.md)を使用してください。

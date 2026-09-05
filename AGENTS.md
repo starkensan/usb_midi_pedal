@@ -16,7 +16,7 @@
 
 - `README.md`：プロジェクト概要、セットアップ、ビルド方法
 - `docs/README.md`：設計ドキュメントの一覧と記述方針
-- `docs/architecture.md`：ディレクトリ構成、各層の責務、依存関係
+- `docs/designs/architecture.md`：ディレクトリ構成、各層の責務、依存関係
 - `docs/rules/README.md`：実装、検証、ドキュメント、GitHub運用の作業ルール
 
 実装と仕様が変わる場合は、関連するドキュメントも同時に更新してください。

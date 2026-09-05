@@ -6,7 +6,7 @@
 - 対応Issue: #15
 - 対象: USB MIDI Pedalの電源、入出力回路、主要部品およびGPIO使用方針
 
-本書は、製品要件を満たすために確定した電気仕様を記録する。GPIO番号の詳細は[ピン割り当て](pin_assignment.md)、I2C ADCの選定経緯は[ADC選定](designs/adc-selection.md)を参照する。
+本書は、製品要件を満たすために確定した電気仕様を記録する。GPIO番号の詳細は[ピン割り当て](pin_assignment.md)、I2C ADCの選定経緯は[ADC選定](../designs/adc-selection.md)を参照する。
 
 ## 電源
 
@@ -90,3 +90,15 @@ MCP23017でフットスイッチ入力を扱うことで、Tiny 2040のGPIO使�
 - EXP入力の保護・平滑回路の部品定数
 - OLEDの画面レイアウト、設定メニューの項目順およびRGB LEDの表示パターン
 - 筐体内配線の長さと、それに応じた追加ESD保護の要否
+
+## データシート・参照資料
+
+| 部品 | 資料 |
+| --- | --- |
+| Tiny 2040 | [Pimoroni Tiny 2040 回路図](https://cdn.shopify.com/s/files/1/0174/1800/files/Tiny2040_PIM558_schematic.pdf) |
+| ADS1015 | [Texas Instruments ADS1015 データシート](https://www.ti.com/lit/ds/symlink/ads1015.pdf) |
+| MCP23017 | [Microchip MCP23017 製品ページおよびデータシート](https://www.microchip.com/en-us/product/mcp23017) |
+| SH1106 | [SH1106 コントローラデータシート](https://www.displayfuture.com/Display/datasheet/controller/SH1106.pdf) |
+| 74HCT14 | [Nexperia 74HCT14 データシート](https://assets.nexperia.com/documents/data-sheet/74HC_HCT14.pdf) |
+
+フットスイッチ、ロータリーエンコーダー、DINコネクタ、TRSジャックおよびSH1106 OLEDモジュールは型番未選定のため、選定後に個別の資料リンクを追加する。

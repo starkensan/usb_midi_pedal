@@ -124,7 +124,7 @@ sequenceDiagram
 - デバッグ用に3.3 V TTLのUART TX専用出力を備える。DIN MIDI用UARTとは独立したUARTを使用する。
 - OLEDは1.3インチ、128×64、SH1106、I2C、3.3 Vとする。
 - フットスイッチは6個のNOモーメンタリースイッチとし、スイッチ内蔵LEDは使用しない。
-- 電気仕様およびGPIO割り当ての詳細は[ハードウェア仕様](../hardware.md)と[ピン割り当て](../pin_assignment.md)を参照する。
+- 電気仕様およびGPIO割り当ての詳細は[ハードウェア仕様](../specifications/hardware.md)と[ピン割り当て](../specifications/pin_assignment.md)を参照する。
 
 ## 検証方法
 

@@ -24,8 +24,10 @@
 /* Rotary encoder inputs and active-low push button. */
 #define BOARD_ENCODER_BUTTON_PIN 5u
 #define BOARD_ENCODER_A_PIN 27u
+#define BOARD_ENCODER_B_PIN 29u
+
+/* Debug UART output. */
 #define BOARD_DEBUG_UART_INSTANCE uart0
 #define BOARD_DEBUG_UART_TX_PIN 28u
-#define BOARD_ENCODER_B_PIN 29u
 
 #endif /* BOARD_CONFIG_H */

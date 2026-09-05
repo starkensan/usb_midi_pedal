@@ -58,13 +58,14 @@ typedef enum {
     LOG_LEVEL_DEBUG,
 } log_level_t;
 
-void logging_init(void);
-void logging_write(log_level_t level, const char *format, ...);
+error_code_t logging_init(void);
+error_code_t logging_write(log_level_t level, const char *format, ...);
 ```
 
-- `LOG_ERROR`、`LOG_WARN`、`LOG_INFO`、`LOG_DEBUG` は `logging_write` を呼ぶマクロである。
+- `LOG_ERROR`、`LOG_WARN`、`LOG_INFO`、`LOG_DEBUG` は `logging_write` を呼ぶマクロであり、`error_code_t` を返す。
 - `logging_init` はスケジューラ開始前に一度だけ呼ぶ。
 - API はタスクコンテキスト専用であり、ISR から呼んではならない。
+- 初期化前の出力は `ERROR_CODE_NOT_READY`、無効な引数・レベルはそれぞれ `ERROR_CODE_INVALID_ARGUMENT`・`ERROR_CODE_OUT_OF_RANGE` を返す。設定で抑止されたログは正常な無出力として `ERROR_CODE_OK` を返す。
 
 ## データ設計
 

@@ -44,48 +44,77 @@ static size_t bounded_length(const char *text, size_t maximum_length)
     return length;
 }
 
-static void write_output(const char *message, size_t length)
+static error_code_t write_output(const char *message, size_t length)
 {
 #if defined(LOG_CONFIG_OUTPUT_USB_CDC)
-    (void)fwrite(message, 1U, length, stdout);
+    if (fwrite(message, 1U, length, stdout) != length) {
+        return ERROR_CODE_IO;
+    }
+
     stdio_flush();
 #else
     debug_uart_write(message, length);
 #endif
+
+    return ERROR_CODE_OK;
 }
 
-void logging_init(void)
+error_code_t logging_init(void)
 {
+    if (log_mutex != NULL) {
+        return ERROR_CODE_OK;
+    }
+
     log_mutex = xSemaphoreCreateMutexStatic(&log_mutex_storage);
-    configASSERT(log_mutex != NULL);
+    if (log_mutex == NULL) {
+        return ERROR_CODE_NOT_READY;
+    }
 
 #if defined(LOG_CONFIG_OUTPUT_UART)
     debug_uart_init();
 #endif
+
+    return ERROR_CODE_OK;
 }
 
-void logging_write(log_level_t level, const char *format, ...)
+error_code_t logging_write(log_level_t level, const char *format, ...)
 {
+    error_code_t result;
     va_list arguments;
 
     va_start(arguments, format);
-    logging_vwrite(level, format, arguments);
+    result = logging_vwrite(level, format, arguments);
     va_end(arguments);
+
+    return result;
 }
 
-void logging_vwrite(log_level_t level, const char *format, va_list arguments)
+error_code_t logging_vwrite(log_level_t level, const char *format, va_list arguments)
 {
     char buffer[LOG_BUFFER_SIZE];
     int prefix_length;
     int message_length;
     size_t length;
 
-    if (level > LOG_LEVEL_DEBUG || format == NULL || !is_enabled(level)) {
-        return;
+    if (level > LOG_LEVEL_DEBUG) {
+        return ERROR_CODE_OUT_OF_RANGE;
     }
 
-    configASSERT(log_mutex != NULL);
-    (void)xSemaphoreTake(log_mutex, portMAX_DELAY);
+    if (format == NULL) {
+        return ERROR_CODE_INVALID_ARGUMENT;
+    }
+
+    if (!is_enabled(level)) {
+        return ERROR_CODE_OK;
+    }
+
+    if (log_mutex == NULL) {
+        return ERROR_CODE_NOT_READY;
+    }
+
+    if (xSemaphoreTake(log_mutex, portMAX_DELAY) != pdTRUE) {
+        return ERROR_CODE_TIMEOUT;
+    }
 
     prefix_length = snprintf(buffer, sizeof(buffer), "[%s] ", level_names[level]);
     if (prefix_length > 0 && (size_t)prefix_length < sizeof(buffer)) {
@@ -100,9 +129,12 @@ void logging_vwrite(log_level_t level, const char *format, va_list arguments)
             buffer[length++] = '\r';
             buffer[length++] = '\n';
             buffer[length] = '\0';
-            write_output(buffer, length);
+            const error_code_t result = write_output(buffer, length);
+            (void)xSemaphoreGive(log_mutex);
+            return result;
         }
     }
 
     (void)xSemaphoreGive(log_mutex);
+    return ERROR_CODE_IO;
 }

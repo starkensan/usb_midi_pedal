@@ -21,6 +21,7 @@ set(PICO_PLATFORM rp2040 CACHE STRING "Target platform")
 
 if(USB_MIDI_PEDAL_BUILD_FIRMWARE)
     include(cmake/pico_sdk_import.cmake)
+    include(config/logging.cmake)
 endif()
 
 project(usb_midi_pedal VERSION 0.1.0 LANGUAGES C)

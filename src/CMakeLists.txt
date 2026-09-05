@@ -7,6 +7,10 @@ target_link_libraries(usb_midi_pedal PRIVATE
     FreeRTOS-Kernel-Static
 )
 
+target_include_directories(usb_midi_pedal PRIVATE
+    ${CMAKE_CURRENT_LIST_DIR}/inc
+)
+
 target_compile_options(usb_midi_pedal PRIVATE
     -Wall
     -Wextra

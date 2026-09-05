@@ -66,10 +66,7 @@ flowchart TD
     remote_permission -- はい --> push[作業ブランチをpush]
     push --> pr[develop向けPRを作成]
     pr --> merge[PRがdevelopへマージ]
-    merge --> close_permission{Issueクローズについて\nユーザー確認済みか}
-    close_permission -- いいえ --> ask_close[ユーザーへ確認]
-    ask_close --> close_permission
-    close_permission -- はい --> close[Issueをクローズ]
+    merge --> close[Actionsが対応Issueを\n自動クローズ]
     close --> report
 ```
 

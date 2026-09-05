@@ -1,6 +1,8 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
+#include "board/board_config.h"
+
 #include "pico/stdlib.h"
 
 enum {

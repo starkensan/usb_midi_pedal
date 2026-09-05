@@ -5,6 +5,7 @@ add_executable(usb_midi_pedal
 )
 
 target_include_directories(usb_midi_pedal PRIVATE
+    ${CMAKE_CURRENT_LIST_DIR}
     ${CMAKE_CURRENT_LIST_DIR}/app/logging
     ${CMAKE_CURRENT_LIST_DIR}/drivers/debug_uart
 )

@@ -38,7 +38,7 @@ flowchart LR
 ```
 
 - `app/logging` はレベルフィルタ、書式化、タスク間排他、出力先の振り分けを担う。
-- `drivers/debug_uart` は Pico SDK の UART0/GP28 操作だけを担う。
+- `drivers/debug_uart` は `board_config.h` が定義する UART0/GP28 の Pico SDK 操作だけを担う。
 - `config/logging.cmake` は出力先と最低出力レベルを定義し、CMake がコンパイル定義と stdio 設定へ変換する。
 
 出力先と最低出力レベルは、設定ファイルの既定値を変更するか、CMake 構成時に上書きする。

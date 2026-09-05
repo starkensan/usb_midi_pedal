@@ -2,7 +2,7 @@
 #include "task.h"
 
 #include "board/board_config.h"
-
+#include "drivers/rgb_led/rgb_led.h"
 #include "pico/stdlib.h"
 
 enum {
@@ -17,15 +17,11 @@ static void heartbeat_task(void *parameters)
 {
     (void)parameters;
 
-    const uint led_pin = PICO_DEFAULT_LED_PIN;
-    bool is_on = false;
-
-    gpio_init(led_pin);
-    gpio_set_dir(led_pin, GPIO_OUT);
+    rgb_led_init();
+    rgb_led_set_color(RGB_LED_COLOR_GREEN);
 
     for (;;) {
-        is_on = !is_on;
-        gpio_put(led_pin, PICO_DEFAULT_LED_PIN_INVERTED ? !is_on : is_on);
+        rgb_led_toggle();
         vTaskDelay(pdMS_TO_TICKS(HEARTBEAT_PERIOD_MS));
     }
 }

@@ -21,6 +21,9 @@ SH1106のI2Cアドレスは、ファームウェアでは`0x3C`を使用する�
 | GP5 | GPIO | エンコーダー押しボタン | 入力 | active-low |
 | GP6 | GPIO | 未使用 | - | 将来拡張用 |
 | GP7 | GPIO | 未使用 | - | 将来拡張用 |
+| GP18 | GPIO | 内蔵RGB LED（R） | 出力 | active-low |
+| GP19 | GPIO | 内蔵RGB LED（G） | 出力 | active-low |
+| GP20 | GPIO | 内蔵RGB LED（B） | 出力 | active-low |
 | GP26 | GPIO | 未使用 | - | 将来拡張用 |
 | GP27 | GPIO | エンコーダーA相 | 入力 | active-low |
 | GP28 | UART0 TX | デバッグUART TX | 出力 | 3.3 V TTL、TX専用 |

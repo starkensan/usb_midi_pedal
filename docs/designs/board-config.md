@@ -16,6 +16,7 @@
 - ADS1015のData Ready入力ピン
 - DIN MIDIおよびデバッグUARTのインスタンスと送信ピン
 - ロータリーエンコーダーの入力ピン
+- 内蔵RGB LEDの各チャネルのGPIOとactive-low設定
 
 ### 対象外
 
@@ -44,6 +45,7 @@ flowchart LR
 - `BOARD_DIN_MIDI_UART_*`: DIN MIDI出力用UART
 - `BOARD_DEBUG_UART_*`: デバッグUART
 - `BOARD_ENCODER_*`: ロータリーエンコーダーの入力ピン
+- `BOARD_RGB_LED_*`: 内蔵RGB LEDのR/G/B各チャネルのGPIOと極性
 
 I2CおよびUARTのインスタンスはPico SDKの`i2c1`、`uart0`、`uart1`を用いる。
 

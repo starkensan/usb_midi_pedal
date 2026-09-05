@@ -30,4 +30,10 @@
 #define BOARD_DEBUG_UART_INSTANCE uart0
 #define BOARD_DEBUG_UART_TX_PIN 28u
 
+/* Tiny 2040 built-in RGB LED; all channels are active-low. */
+#define BOARD_RGB_LED_RED_PIN 18u
+#define BOARD_RGB_LED_GREEN_PIN 19u
+#define BOARD_RGB_LED_BLUE_PIN 20u
+#define BOARD_RGB_LED_IS_ACTIVE_LOW 1
+
 #endif /* BOARD_CONFIG_H */

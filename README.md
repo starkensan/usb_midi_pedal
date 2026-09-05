@@ -11,7 +11,7 @@ Pimoroni Tiny 2040を使用した、拡張可能なUSB/DIN MIDIフットペダ�
 - エクスプレッションペダル × 1
 - 128 × 64 I2C OLED
 - Tiny 2040内蔵RGB LED
-- USB MIDI IN/OUT
+- USB MIDI OUT
 - DIN MIDI OUT
 
 ## ソフトウェア構成
@@ -67,8 +67,12 @@ cmake --build --preset debug
 
 設計仕様と設計判断は[ドキュメント一覧](docs/README.md)にまとめています。
 
+- [製品要件・仕様](docs/designs/product-requirements.md)：製品の目的、対象範囲、機能要件
 - [アーキテクチャ](docs/architecture.md)：ディレクトリ構成、各層の責務、依存関係
-- 今後追加予定：ハードウェア、ピン割り当て、RTOS、MIDI、プリセット、画面設計
+- [ハードウェア仕様](docs/hardware.md)：電源、入出力回路、使用部品
+- [ピン割り当て](docs/pin_assignment.md)：Tiny 2040のGPIO、I2C、UARTの割り当て
+- [I2C ADC選定記録](docs/designs/adc-selection.md)：ADC候補の比較とMCP3221採用理由
+- 今後追加予定：RTOS、MIDI、プリセット、画面設計
 
 ## 現在の状態
 

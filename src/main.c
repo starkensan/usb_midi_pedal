@@ -2,7 +2,7 @@
 #include "task.h"
 
 #include "board/board_config.h"
-
+#include "logging.h"
 #include "pico/stdlib.h"
 
 enum {
@@ -44,6 +44,8 @@ void vApplicationStackOverflowHook(TaskHandle_t task, char *task_name)
 int main(void)
 {
     stdio_init_all();
+    logging_init();
+    LOG_INFO("USB MIDI Pedal starting");
 
     TaskHandle_t heartbeat = xTaskCreateStatic(
         heartbeat_task,

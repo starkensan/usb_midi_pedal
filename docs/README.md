@@ -10,6 +10,7 @@
 | --- | --- | --- |
 | 作成済み | [architecture.md](architecture.md) | `app`、`lib`、`drivers`の責務と依存関係 |
 | 作成済み | [designs/README.md](designs/README.md) | 機能・モジュールごとの設計ドキュメント |
+| 作成済み | [designs/product-requirements.md](designs/product-requirements.md) | 製品全体の要件と仕様 |
 | 作成済み | [rules/README.md](rules/README.md) | 実装、検証、ドキュメント、GitHub運用の作業ルール |
 | 作成予定 | `hardware.md` | 使用部品、電源、入出力回路の仕様 |
 | 作成予定 | `pin_assignment.md` | GPIO、ADC、I2C、UARTのピン割り当て |

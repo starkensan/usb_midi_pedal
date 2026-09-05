@@ -3,6 +3,8 @@
 
 #include <stdarg.h>
 
+#include "error_code.h"
+
 typedef enum {
     LOG_LEVEL_ERROR = 0,
     LOG_LEVEL_WARN,
@@ -10,9 +12,9 @@ typedef enum {
     LOG_LEVEL_DEBUG,
 } log_level_t;
 
-void logging_init(void);
-void logging_write(log_level_t level, const char *format, ...);
-void logging_vwrite(log_level_t level, const char *format, va_list arguments);
+error_code_t logging_init(void);
+error_code_t logging_write(log_level_t level, const char *format, ...);
+error_code_t logging_vwrite(log_level_t level, const char *format, va_list arguments);
 
 #define LOG_ERROR(...) logging_write(LOG_LEVEL_ERROR, __VA_ARGS__)
 #define LOG_WARN(...)  logging_write(LOG_LEVEL_WARN, __VA_ARGS__)

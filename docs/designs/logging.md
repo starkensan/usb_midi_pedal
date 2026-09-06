@@ -62,6 +62,7 @@ error_code_t logging_init(void);
 error_code_t logging_write(log_level_t level, const char *format, ...);
 ```
 
+- `log_level_t` とその有効性・出力判定は、ハードウェア非依存の `lib/logging` に配置する。
 - `LOG_ERROR`、`LOG_WARN`、`LOG_INFO`、`LOG_DEBUG` は `logging_write` を呼ぶマクロであり、`error_code_t` を返す。
 - `logging_init` はスケジューラ開始前に一度だけ呼ぶ。
 - API はタスクコンテキスト専用であり、ISR から呼んではならない。
@@ -95,6 +96,7 @@ sequenceDiagram
 
 ## テスト方針
 
+- `cmake --preset host-tests` で構成し、Unity の `test_log_level` でログレベルの有効性とフィルタを検証する。
 - Debug ビルドで `LOG_OUTPUT=UART` と `LOG_OUTPUT=USB_CDC` の両方をビルドする。
 - UART 選択時は USB-UART 変換器で、USB CDC 選択時はホストの仮想 COM ポートで各レベルの行を確認する。
 

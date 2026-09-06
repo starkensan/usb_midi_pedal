@@ -28,11 +28,6 @@ static const char *const level_names[] = {
     [LOG_LEVEL_DEBUG] = "DEBUG",
 };
 
-static bool is_enabled(log_level_t level)
-{
-    return level <= LOG_CONFIG_MIN_LEVEL;
-}
-
 static size_t bounded_length(const char *text, size_t maximum_length)
 {
     size_t length = 0;
@@ -96,7 +91,7 @@ error_code_t logging_vwrite(log_level_t level, const char *format, va_list argum
     int message_length;
     size_t length;
 
-    if (level > LOG_LEVEL_DEBUG) {
+    if (!log_level_is_valid(level)) {
         return ERROR_CODE_OUT_OF_RANGE;
     }
 
@@ -104,7 +99,7 @@ error_code_t logging_vwrite(log_level_t level, const char *format, va_list argum
         return ERROR_CODE_INVALID_ARGUMENT;
     }
 
-    if (!is_enabled(level)) {
+    if (!log_level_is_enabled(level, LOG_CONFIG_MIN_LEVEL)) {
         return ERROR_CODE_OK;
     }
 

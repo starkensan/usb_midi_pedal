@@ -12,7 +12,7 @@
 
 ### 対象
 
-- I2C1のピン、通信速度および接続デバイスのI2Cアドレス
+- OLED専用I2C0および入力系I2C1のピン、通信速度、接続デバイスのI2Cアドレス
 - ADS1015のData Ready入力ピン
 - DIN MIDIおよびデバッグUARTのインスタンスと送信ピン
 - ロータリーエンコーダーの入力ピン
@@ -28,7 +28,8 @@
 
 ```mermaid
 flowchart LR
-    driver[drivers] --> config[board_config.h]
+    display[display driver] --> config[board_config.h]
+    input[input drivers] --> config
     config --> pico[Pico SDK hardware headers]
 ```
 
@@ -40,14 +41,16 @@ flowchart LR
 
 `board_config.h`は次の接頭辞を持つマクロを公開する。
 
-- `BOARD_I2C_*`: 共有I2Cバスのインスタンス、ピン、通信速度およびデバイスアドレス
+- `BOARD_OLED_I2C_*`: OLED専用I2C0のインスタンス、ピン、アドレス
+- `BOARD_INPUT_I2C_*`: ADS1015およびMCP23017共有のI2C1のインスタンス、ピン
+- `BOARD_I2C_BAUD_RATE_HZ`: 両I2Cバスの通信速度
 - `BOARD_EXPRESSION_ADC_READY_PIN`: ADS1015のData Ready入力ピン
 - `BOARD_DIN_MIDI_UART_*`: DIN MIDI出力用UART
 - `BOARD_DEBUG_UART_*`: デバッグUART
 - `BOARD_ENCODER_*`: ロータリーエンコーダーの入力ピン
 - `BOARD_RGB_LED_*`: 内蔵RGB LEDのR/G/B各チャネルのGPIOと極性
 
-I2CおよびUARTのインスタンスはPico SDKの`i2c1`、`uart0`、`uart1`を用いる。
+I2CおよびUARTのインスタンスはPico SDKの`i2c0`、`i2c1`、`uart0`、`uart1`を用いる。OLEDは`i2c0`、入力系デバイスは`i2c1`を用いる。
 
 ## 検証方針
 

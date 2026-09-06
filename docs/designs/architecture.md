@@ -16,6 +16,8 @@ usb_midi_pedal/
 ├─ external/                Git submoduleなどの外部依存
 ├─ src/
 │  ├─ app/                  製品固有処理、FreeRTOSタスク、状態管理
+│  │  ├─ app_controller/    状態機械、設定、保存、UIモデル
+│  │  ├─ runtime/           実行設定とペダルイベントの処理
 │  │  └─ tasks/
 │  ├─ board/                基板固有の初期化とピン設定
 │  ├─ drivers/              Pico SDKおよびデバイス依存処理
@@ -46,6 +48,7 @@ usb_midi_pedal/
 - Queueやタスク通知による処理の連携
 - 動作モード、画面遷移、プリセット選択などの製品固有処理
 - `lib`と`drivers`の組み合わせ
+- `app_controller`と`runtime`間のコマンド・返信による制御系と実行系の分離
 
 ### `lib`
 
@@ -85,7 +88,8 @@ flowchart LR
     app --> drivers[drivers]
     app --> freertos[FreeRTOS]
     drivers --> lib
-    drivers --> pico[Pico SDK]
+    drivers --> board[board]
+    board --> pico[Pico SDK]
     drivers --> tinyusb[TinyUSB]
 
     classDef internal fill:#e8f1ff,stroke:#2563eb,color:#111827
@@ -101,6 +105,7 @@ flowchart LR
 - `lib`から`app`または`drivers`へ依存してはいけません。
 - FreeRTOS APIは原則として`app`内で使用します。
 - Pico SDK APIは`drivers`と`board`内に閉じ込めます。
+- `app_controller`は設定の正本を、`runtime`は有効化済み設定のコピーと演奏中の状態を所有します。
 
 ## コードの配置例
 
@@ -115,3 +120,5 @@ flowchart LR
 | プリセット変更時の処理連携 | `app/` |
 | プリセットのシリアライズ | `lib/preset/` |
 | flashの消去と書き込み | `drivers/flash_storage/` |
+
+状態機械、タスク、Queue、モジュール間通信および保存方針は[Runtimeアーキテクチャ](runtime-architecture.md)を参照する。

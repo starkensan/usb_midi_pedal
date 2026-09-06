@@ -82,5 +82,5 @@ cmake --build --preset debug
 - [x] CMakeビルド設定
 - [x] Pimoroni Tiny 2040公式ボード定義の選択
 - [x] 最小FreeRTOS起動とRGB LED点滅タスク
-- [ ] プロジェクト固有のピン定義
+- [x] プロジェクト固有のピン定義
 - [ ] USB MIDI実装

@@ -14,6 +14,7 @@
 | 作成済み | [designs/adc-selection.md](designs/adc-selection.md) | I2C ADC候補の比較とADS1015採用判断 |
 | 作成済み | [designs/runtime-architecture.md](designs/runtime-architecture.md) | 状態機械、タスク、モジュール境界、保存、将来のデュアルコア移行方針 |
 | 作成済み | [designs/rtos-mailbox.md](designs/rtos-mailbox.md) | FreeRTOSタスク間で固定長メッセージを受け渡す静的メールボックス |
+| 作成済み | [designs/operation-state-machine.md](designs/operation-state-machine.md) | 操作状態の遷移と副作用の通知 |
 | 作成済み | [rules/README.md](rules/README.md) | 実装、検証、ドキュメント、GitHub運用の作業ルール |
 | 設計予定 | `designs/rtos-design.md` | FreeRTOSタスクのスタック量、周期、実装時の詳細設計 |
 | 設計 | `designs/testing.md` | ホスト単体テスト、Unity/CMock、CTest構成 |

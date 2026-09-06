@@ -6,6 +6,7 @@ add_executable(usb_midi_pedal
     app/rtos_mailbox/rtos_mailbox.c
     drivers/debug_uart/debug_uart.c
     drivers/usb_cdc/usb_cdc.c
+    app/app_controller/app_state_machine.c
 )
 
 target_include_directories(usb_midi_pedal PRIVATE

@@ -21,6 +21,7 @@ add_custom_command(
 add_executable(rgb_led_test
     drivers/rgb_led_test.c
     ${PROJECT_SOURCE_DIR}/src/drivers/rgb_led/rgb_led.c
+    ${PROJECT_SOURCE_DIR}/external/CMock/src/cmock.c
     ${CMOCK_GPIO_SOURCE}
     ${CMOCK_GPIO_INCLUDE}
 )

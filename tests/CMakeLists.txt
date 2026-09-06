@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 find_package(Ruby 3.0 REQUIRED)
 
 add_subdirectory(${PROJECT_SOURCE_DIR}/external/Unity

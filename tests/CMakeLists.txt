@@ -28,6 +28,7 @@ add_executable(rgb_led_test
 target_include_directories(rgb_led_test PRIVATE
     ${CMOCK_OUTPUT_DIRECTORY}
     ${CMAKE_CURRENT_SOURCE_DIR}/mocks
+    ${CMAKE_CURRENT_SOURCE_DIR}/mocks/hardware
     ${PROJECT_SOURCE_DIR}/external/CMock/src
     ${PROJECT_SOURCE_DIR}/src
 )

@@ -19,6 +19,10 @@ option(USB_MIDI_PEDAL_BUILD_FIRMWARE "Build the RP2040 firmware" ON)
 set(PICO_BOARD pimoroni_tiny2040 CACHE STRING "Target board")
 set(PICO_PLATFORM rp2040 CACHE STRING "Target platform")
 
+if(USB_MIDI_PEDAL_BUILD_FIRMWARE)
+    include(cmake/pico_sdk_import.cmake)
+endif()
+
 project(usb_midi_pedal VERSION 0.1.0 LANGUAGES C)
 
 set(CMAKE_C_STANDARD 11)
@@ -28,7 +32,6 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if(USB_MIDI_PEDAL_BUILD_FIRMWARE)
-    include(cmake/pico_sdk_import.cmake)
     enable_language(CXX ASM)
     pico_sdk_init()
 

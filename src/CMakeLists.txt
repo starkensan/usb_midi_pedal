@@ -3,6 +3,7 @@ add_executable(usb_midi_pedal
     lib/logging/log_level.c
     drivers/rgb_led/rgb_led.c
     app/logging/logging.c
+    app/rtos_mailbox/rtos_mailbox.c
     drivers/debug_uart/debug_uart.c
     drivers/usb_cdc/usb_cdc.c
 )

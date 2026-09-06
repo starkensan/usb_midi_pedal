@@ -4,3 +4,9 @@
 [submodule "external/FreeRTOS-Kernel"]
 	path = external/FreeRTOS-Kernel
 	url = https://github.com/FreeRTOS/FreeRTOS-Kernel.git
+[submodule "external/Unity"]
+	path = external/Unity
+	url = https://github.com/ThrowTheSwitch/Unity.git
+[submodule "external/CMock"]
+	path = external/CMock
+	url = https://github.com/ThrowTheSwitch/CMock.git

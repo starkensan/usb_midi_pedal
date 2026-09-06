@@ -19,6 +19,22 @@ cmake --preset debug
 cmake --build --preset debug
 ```
 
+## ホスト単体テスト
+
+ハードウェアに依存しないロジックとドライバは、開発PC上でUnityとCMockを
+使用してテストします。ホストテスト用プリセットはPico SDKとFreeRTOSを
+読み込まないため、ファームウェアとは分けて構成してください。
+
+```powershell
+cmake --preset host-tests
+cmake --build --preset host-tests
+ctest --test-dir build/host-tests --output-on-failure
+```
+
+ホストテストにはネイティブCコンパイラと、CMockのモック生成用にRuby 3.0以降が
+必要です。UnityとCMockを利用できるように、リポジトリを取得した後はすべての
+サブモジュールを初期化してください。
+
 変更後は、少なくともDebugビルドが成功することを確認してください。ビルドできない環境では、実行できなかった理由を明記してください。
 
 ## コミット前の確認

@@ -33,6 +33,7 @@ usb_midi_pedal/
 │     └─ preset/
 ├─ tests/                   PC上で実行する単体テスト
 │  ├─ lib/
+│  ├─ drivers/
 │  └─ mocks/
 └─ tools/                   開発用補助ツール
 ```

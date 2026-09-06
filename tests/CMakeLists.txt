@@ -50,3 +50,15 @@ target_link_libraries(test_log_level PRIVATE unity::framework)
 target_compile_options(test_log_level PRIVATE -Wall -Wextra)
 
 add_test(NAME test_log_level COMMAND test_log_level)
+
+add_executable(app_state_machine_test
+    app/app_state_machine_test.c
+    ${PROJECT_SOURCE_DIR}/src/app/app_controller/app_state_machine.c
+)
+target_include_directories(app_state_machine_test PRIVATE
+    ${PROJECT_SOURCE_DIR}/src/app/app_controller
+)
+target_link_libraries(app_state_machine_test PRIVATE unity::framework)
+target_compile_options(app_state_machine_test PRIVATE -Wall -Wextra -Werror)
+
+add_test(NAME app_state_machine_test COMMAND app_state_machine_test)

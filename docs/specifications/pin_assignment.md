@@ -13,13 +13,13 @@ SH1106のI2Cアドレスは、ファームウェアでは`0x3C`を使用する�
 
 | GPIO | RP2040機能 | 接続先 | 入出力 | 備考 |
 | --- | --- | --- | --- | --- |
-| GP0 | GPIO | ADS1015 `ALERT/RDY` | 入力 | 立下りエッジ割り込み |
-| GP1 | GPIO | 未使用 | - | 将来拡張用 |
-| GP2 | I2C1 SDA | SH1106 OLED、ADS1015、MCP23017 SDA | 双方向 | 3.3 V、400 kHz |
-| GP3 | I2C1 SCL | SH1106 OLED、ADS1015、MCP23017 SCL | 出力 | 3.3 V、400 kHz |
+| GP0 | I2C0 SDA | SH1106 OLED SDA | 双方向 | 3.3 V、400 kHz、OLED専用 |
+| GP1 | I2C0 SCL | SH1106 OLED SCL | 出力 | 3.3 V、400 kHz、OLED専用 |
+| GP2 | I2C1 SDA | ADS1015、MCP23017 SDA | 双方向 | 3.3 V、400 kHz |
+| GP3 | I2C1 SCL | ADS1015、MCP23017 SCL | 出力 | 3.3 V、400 kHz |
 | GP4 | UART1 TX | 74HCT14入力 | 出力 | DIN MIDI OUT用 |
 | GP5 | GPIO | エンコーダー押しボタン | 入力 | active-low |
-| GP6 | GPIO | 未使用 | - | 将来拡張用 |
+| GP6 | GPIO | ADS1015 `ALERT/RDY` | 入力 | 立下りエッジ割り込み |
 | GP7 | GPIO | 未使用 | - | 将来拡張用 |
 | GP18 | GPIO | 内蔵RGB LED（R） | 出力 | active-low |
 | GP19 | GPIO | 内蔵RGB LED（G） | 出力 | active-low |
@@ -39,7 +39,8 @@ SH1106のI2Cアドレスは、ファームウェアでは`0x3C`を使用する�
 
 ## 制約
 
-- Tiny 2040のGPIO使用数は8本である。GP1、GP6、GP7およびGP26は将来拡張用に確保する。
+- OLEDを入力系I2Cバスから分離するため、SH1106はI2C0、ADS1015とMCP23017はI2C1へ接続する。
+- GP7およびGP26は将来拡張用に確保する。
 - GP26〜GP29はADC機能を持つ。GP27およびGP29はデジタル入力、GP28はUART0 TXとして使用し、EXP入力は外部I2C ADCのADS1015へ接続する。
 - フットスイッチはMCP23017で読み取るため、追加する場合も残る10入力を利用できる。
 - UART RXは使用しない。DIN MIDI INは製品スコープ外である。

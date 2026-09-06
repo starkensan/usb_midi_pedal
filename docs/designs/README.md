@@ -8,6 +8,7 @@
 - [共通エラーコード設計](error-codes.md)
 - [RGB LEDドライバ](rgb-led-driver.md)
 - [ログ出力](logging.md)
+- [Runtimeアーキテクチャ](runtime-architecture.md)
 - 新規ドキュメントは`<機能名またはモジュール名>.md`の形式で追加します。
 - ファイル名は小文字kebab-caseを使用します。
 - [設計ドキュメントのテンプレート](../rules/design_document.md)を使用してください。

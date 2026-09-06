@@ -92,7 +92,9 @@ sequenceDiagram
 
 - UART を選んだ場合は UART0 TX の GP28 を 115200 bit/s、8N1 で使用する。
 - UART の送信は完了まで待機するため、ログ多発経路では使用しない。
-- USB CDC は TinyUSB の stdio バックエンドを使用する。
+- USB CDC は TinyUSB の stdio バックエンドを使用する。FreeRTOSを使用する構成では、
+  SDKのアラームベースのバックグラウンド処理を無効にし、アプリケーションの
+  `usb_cdc_task` が1 ms周期でTinyUSBを処理する。
 
 ## テスト方針
 

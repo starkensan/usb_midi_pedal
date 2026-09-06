@@ -3,15 +3,24 @@
 
 #include "board/board_config.h"
 #include "drivers/rgb_led/rgb_led.h"
+#include "drivers/usb_cdc/usb_cdc.h"
+#include "logging.h"
 #include "pico/stdlib.h"
 
 enum {
     HEARTBEAT_TASK_STACK_WORDS = 256,
     HEARTBEAT_PERIOD_MS = 500,
+    USB_CDC_TASK_STACK_WORDS = 256,
+    USB_CDC_SERVICE_PERIOD_MS = 1,
 };
 
 static StaticTask_t heartbeat_task_buffer;
 static StackType_t heartbeat_task_stack[HEARTBEAT_TASK_STACK_WORDS];
+
+#if defined(LOG_CONFIG_OUTPUT_USB_CDC)
+static StaticTask_t usb_cdc_task_buffer;
+static StackType_t usb_cdc_task_stack[USB_CDC_TASK_STACK_WORDS];
+#endif
 
 static void heartbeat_task(void *parameters)
 {
@@ -26,6 +35,18 @@ static void heartbeat_task(void *parameters)
     }
 }
 
+#if defined(LOG_CONFIG_OUTPUT_USB_CDC)
+static void usb_cdc_task(void *parameters)
+{
+    (void)parameters;
+
+    for (;;) {
+        usb_cdc_service();
+        vTaskDelay(pdMS_TO_TICKS(USB_CDC_SERVICE_PERIOD_MS));
+    }
+}
+#endif
+
 void vApplicationStackOverflowHook(TaskHandle_t task, char *task_name)
 {
     (void)task;
@@ -39,7 +60,16 @@ void vApplicationStackOverflowHook(TaskHandle_t task, char *task_name)
 
 int main(void)
 {
+#if defined(LOG_CONFIG_OUTPUT_USB_CDC)
+    if (!usb_cdc_init()) {
+        return 1;
+    }
+#else
     stdio_init_all();
+#endif
+
+    logging_init();
+    LOG_INFO("USB MIDI Pedal starting");
 
     TaskHandle_t heartbeat = xTaskCreateStatic(
         heartbeat_task,
@@ -51,6 +81,19 @@ int main(void)
         &heartbeat_task_buffer);
 
     configASSERT(heartbeat != NULL);
+
+#if defined(LOG_CONFIG_OUTPUT_USB_CDC)
+    TaskHandle_t usb_cdc = xTaskCreateStatic(
+        usb_cdc_task,
+        "usb_cdc",
+        USB_CDC_TASK_STACK_WORDS,
+        NULL,
+        tskIDLE_PRIORITY + 1,
+        usb_cdc_task_stack,
+        &usb_cdc_task_buffer);
+
+    configASSERT(usb_cdc != NULL);
+#endif
 
     vTaskStartScheduler();
 

@@ -37,3 +37,16 @@ target_link_libraries(rgb_led_test PRIVATE unity::framework)
 target_compile_options(rgb_led_test PRIVATE -Wall -Wextra -Werror)
 
 add_test(NAME rgb_led_test COMMAND rgb_led_test)
+
+add_executable(test_log_level
+    test_log_level.c
+    ${PROJECT_SOURCE_DIR}/src/lib/logging/log_level.c
+)
+
+target_include_directories(test_log_level PRIVATE
+    ${PROJECT_SOURCE_DIR}/src/lib/logging
+)
+target_link_libraries(test_log_level PRIVATE unity::framework)
+target_compile_options(test_log_level PRIVATE -Wall -Wextra)
+
+add_test(NAME test_log_level COMMAND test_log_level)

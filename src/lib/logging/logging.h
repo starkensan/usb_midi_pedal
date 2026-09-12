@@ -1,5 +1,5 @@
-#ifndef PLATFORM_LOGGING_LOGGING_H
-#define PLATFORM_LOGGING_LOGGING_H
+#ifndef LIB_LOGGING_LOGGING_H
+#define LIB_LOGGING_LOGGING_H
 
 #include <stdarg.h>
 

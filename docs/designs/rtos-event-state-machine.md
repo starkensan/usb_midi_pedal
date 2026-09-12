@@ -27,4 +27,4 @@ bool state_machine_process_next(state_machine_t *machine, uint32_t timeout_ms);
 
 ## 検証方法
 
-- ホスト単体テストでイベントIDとparameterの配送、状態遷移、Event Flag通知、空mailboxを確認する。
+- Debugファームウェアをビルドし、FreeRTOSを直接利用するmailboxおよびEvent Flagとともにコンパイルできることを確認する。

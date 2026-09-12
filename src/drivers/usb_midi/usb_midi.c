@@ -1,4 +1,5 @@
 #include "usb_midi.h"
+#include "usb_midi_tinyusb.h"
 
 #include <stddef.h>
 
@@ -17,12 +18,12 @@ enum {
 static StaticSemaphore_t tinyusb_mutex_storage;
 static SemaphoreHandle_t tinyusb_mutex;
 
-static bool tinyusb_lock(void)
+bool usb_midi_tinyusb_try_lock(void)
 {
     return tinyusb_mutex != NULL && xSemaphoreTake(tinyusb_mutex, 0U) == pdTRUE;
 }
 
-static void tinyusb_unlock(void)
+void usb_midi_tinyusb_unlock(void)
 {
     (void)xSemaphoreGive(tinyusb_mutex);
 }
@@ -41,22 +42,22 @@ bool usb_midi_init(void)
 
 void usb_midi_service(void)
 {
-    if (!tinyusb_lock()) {
+    if (!usb_midi_tinyusb_try_lock()) {
         return;
     }
 
     tud_task();
-    tinyusb_unlock();
+    usb_midi_tinyusb_unlock();
 }
 
 bool usb_midi_is_connected(void)
 {
-    if (!tinyusb_lock()) {
+    if (!usb_midi_tinyusb_try_lock()) {
         return false;
     }
 
     const bool connected = tud_midi_mounted();
-    tinyusb_unlock();
+    usb_midi_tinyusb_unlock();
     return connected;
 }
 
@@ -71,13 +72,13 @@ bool usb_midi_send_program_change(uint8_t channel, uint8_t program)
         return false;
     }
 
-    if (!tinyusb_lock()) {
+    if (!usb_midi_tinyusb_try_lock()) {
         return false;
     }
 
     const bool sent =
         tud_midi_stream_write(USB_MIDI_CABLE_NUMBER, message, sizeof(message)) == sizeof(message);
-    tinyusb_unlock();
+    usb_midi_tinyusb_unlock();
     return sent;
 }
 
@@ -93,12 +94,12 @@ bool usb_midi_send_control_change(uint8_t channel, uint8_t controller, uint8_t v
         return false;
     }
 
-    if (!tinyusb_lock()) {
+    if (!usb_midi_tinyusb_try_lock()) {
         return false;
     }
 
     const bool sent =
         tud_midi_stream_write(USB_MIDI_CABLE_NUMBER, message, sizeof(message)) == sizeof(message);
-    tinyusb_unlock();
+    usb_midi_tinyusb_unlock();
     return sent;
 }

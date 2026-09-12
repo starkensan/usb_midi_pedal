@@ -33,15 +33,16 @@ flowchart LR
     app[アプリケーションタスク] --> logging[platform/logging]
     logging --> output[drivers/log_output]
     output --> uart[drivers/debug_uart]
-    output --> usb[USB CDC stdio]
+    output --> usb[drivers/usb_cdc]
     config[config/logging.cmake] --> logging
-    config --> build[CMake stdio設定]
+    config --> build[CMakeビルド設定]
 ```
 
 - `platform/logging` はレベルフィルタ、書式化、タスク間排他を担う。製品固有の状態や処理シーケンスは持たない。
-- `drivers/log_output` は出力先の選択、USB CDC stdioまたはデバッグUARTの初期化と送信を担う。
+- `drivers/log_output` は出力先の選択、USB CDCまたはデバッグUARTの初期化と送信を担う。
+- `drivers/usb_cdc` はCDC送信をTinyUSB APIへ渡す。USB MIDIドライバが管理する排他制御を使用し、TinyUSB APIを並行実行しない。
 - `drivers/debug_uart` は `board_config.h` が定義する UART0/GP28 の Pico SDK 操作だけを担う。
-- `config/logging.cmake` は出力先と最低出力レベルを定義し、CMake がコンパイル定義と stdio 設定へ変換する。
+- `config/logging.cmake` は出力先と最低出力レベルを定義し、CMake がコンパイル定義へ変換する。
 
 出力先と最低出力レベルは、設定ファイルの既定値を変更するか、CMake 構成時に上書きする。
 
@@ -94,9 +95,9 @@ sequenceDiagram
 
 - UART を選んだ場合は UART0 TX の GP28 を 115200 bit/s、8N1 で使用する。
 - UART の送信は完了まで待機するため、ログ多発経路では使用しない。
-- USB CDC は TinyUSB の stdio バックエンドを使用する。FreeRTOSを使用する構成では、
-  SDKのアラームベースのバックグラウンド処理を無効にし、アプリケーションの
-  `usb_cdc_task` が1 ms周期でTinyUSBを処理する。
+- USB CDCはTinyUSB APIを直接使用する。USB MIDIドライバの静的FreeRTOSミューテックスにより、
+  CDC送信とTinyUSBサービス処理を直列化する。
+- `app/tasks/usb_midi_task.c`が1 ms周期でTinyUSBを処理する複合デバイス共通の唯一のサービス・タスクである。
 
 ## テスト方針
 

@@ -71,7 +71,7 @@ sequenceDiagram
 ## RTOS・ハードウェア上の考慮
 
 - TinyUSBはPico SDK構成で初期化し、USB MIDI送信バッファは64 byteに固定する。
-- USBはMIDIとCDCの複合デバイスとして列挙される。`LOG_OUTPUT=USB_CDC`を選ぶと、CDCを診断ログ出力に使用する。
+- USBはMIDIとCDCの複合デバイスとして列挙される。`LOG_OUTPUT=USB_CDC`を選ぶと、CDCをTinyUSB API経由の診断ログ出力に使用する。
 - USBデバイス記述子はIAD複合デバイスのクラス値を使用し、PIDはCDCとMIDIの複合構成を示す`0x4009`とする。
 - 送信関数はブロックしない。送信バッファ満杯時は`false`を返す。
 - ミューテックスの取得に失敗した場合も送信関数は`false`を返す。ISRから送信関数を呼び出さない。

@@ -15,8 +15,6 @@ endif()
 cmake_minimum_required(VERSION 3.20)
 
 option(USB_MIDI_PEDAL_BUILD_FIRMWARE "Build the RP2040 firmware" ON)
-option(USB_MIDI_PEDAL_USB_MIDI_DIAGNOSTIC_SEND
-    "Periodically send USB MIDI diagnostic messages" ON)
 
 set(PICO_BOARD pimoroni_tiny2040 CACHE STRING "Target board")
 set(PICO_PLATFORM rp2040 CACHE STRING "Target platform")

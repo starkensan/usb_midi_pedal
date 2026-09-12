@@ -43,10 +43,6 @@ target_compile_options(usb_midi_pedal PRIVATE
     -Wextra
 )
 
-if(USB_MIDI_PEDAL_USB_MIDI_DIAGNOSTIC_SEND)
-    target_compile_definitions(usb_midi_pedal PRIVATE USB_MIDI_DIAGNOSTIC_SEND_ENABLED)
-endif()
-
 if(LOG_OUTPUT STREQUAL "USB_CDC")
     target_compile_definitions(usb_midi_pedal PRIVATE
         LOG_CONFIG_OUTPUT_USB_CDC

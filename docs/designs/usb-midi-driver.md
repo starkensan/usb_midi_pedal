@@ -72,12 +72,11 @@ sequenceDiagram
 - USBはMIDIとCDCの複合デバイスとして列挙される。`LOG_OUTPUT=USB_CDC`を選ぶと、CDCを診断ログ出力に使用する。
 - USBデバイス記述子はIAD複合デバイスのクラス値を使用し、PIDはCDCとMIDIの複合構成を示す`0x4009`とする。
 - 送信関数はブロックしない。送信バッファ満杯時は`false`を返す。
-- 実機確認用に、`USB_MIDI_PEDAL_USB_MIDI_DIAGNOSTIC_SEND`が有効な場合は、接続後に
-  チャネル1のProgram Change 0とControl Change 1（値64）を1秒ごとに交互送信する。
-  このオプションは既定で有効であり、確認後はCMake構成時に`OFF`を指定して無効化する。
 
 ## 検証方法
 
 - Debugビルドが成功すること。
 - ホスト単体テストで、送信するMIDIメッセージ、入力値検証、および既存の全テストが成功すること。
 - 実機でPCにUSB MIDIデバイスとして認識され、Program ChangeとControl Changeを受信できること。
+  2026-09-12にWeb MIDI APIで、`USB MIDI Pedal`の入出力ポート認識、チャネル1の
+  Program Change 0（`C0 00`）およびControl Change 1、値64（`B0 01 40`）の受信を確認した。

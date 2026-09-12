@@ -1,0 +1,36 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Compile Project",
+            "type": "process",
+            "isBuildCommand": true,
+            "command": "ninja",
+            "args": ["-C", "${workspaceFolder}/build/debug"],
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            },
+            "problemMatcher": "$gcc"
+        },
+        {
+            "label": "Run Project",
+            "type": "process",
+            "command": "${env:HOME}/.pico-sdk/picotool/2.3.0/picotool/picotool",
+            "args": [
+                "load",
+                "${workspaceFolder}/build/debug/src/usb_midi_pedal.elf",
+                "-fx"
+            ],
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            },
+            "problemMatcher": [],
+            "windows": {
+                "command": "${env:USERPROFILE}/.pico-sdk/picotool/2.3.0/picotool/picotool.exe"
+            }
+        }
+    ]
+}

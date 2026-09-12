@@ -24,48 +24,34 @@
 
 ```mermaid
 flowchart LR
-    producer[送信タスク] --> mailbox[lib/concurrency]
-    mailbox --> adapter[platform/freertos]
-    adapter --> queue[FreeRTOS Static Queue]
-    queue --> adapter
-    adapter --> mailbox
+    producer[送信タスク] --> mailbox[lib/rtos_wrapper]
+    mailbox --> queue[FreeRTOS Static Queue]
+    queue --> mailbox
     mailbox --> consumer[受信タスク]
 ```
 
-- `lib/concurrency/mailbox`は、実行基盤に依存しないメールボックス抽象APIを提供する。
-- `platform/freertos/freertos_mailbox`は、静的に確保されたFreeRTOS Queueを用いて抽象APIを実現する。
-- 呼び出し側は`freertos_mailbox_t`と、メッセージ型のサイズ×容量分の格納領域を静的に保持する。
-- `app`は`mailbox_t`だけを使用し、FreeRTOS APIを直接使用しない。
+- `lib/rtos_wrapper/mailbox`は、静的に確保されたFreeRTOS Queueを用いるメールボックスを提供する。
+- 呼び出し側は`mailbox_t`と、メッセージ型のサイズ×容量分の格納領域を静的に保持する。
+- FreeRTOSは本プロジェクトの固定依存であり、`mailbox_t`はFreeRTOSのQueue型を内部に保持する。
 
 ## 公開インターフェース
 
 ```c
-typedef struct mailbox_operations mailbox_operations_t;
-
-typedef struct {
-    void *context;
-    const mailbox_operations_t *operations;
-} mailbox_t;
-
-bool mailbox_send(mailbox_t *mailbox, const void *message, uint32_t timeout_ms);
-bool mailbox_receive(mailbox_t *mailbox, void *message, uint32_t timeout_ms);
-size_t mailbox_message_count(const mailbox_t *mailbox);
-
 typedef struct {
     QueueHandle_t handle;
     StaticQueue_t queue_buffer;
-    mailbox_t mailbox;
-} freertos_mailbox_t;
+} mailbox_t;
 
-bool freertos_mailbox_init(freertos_mailbox_t *mailbox, void *storage,
-                           size_t capacity, size_t item_size);
-mailbox_t *freertos_mailbox_handle(freertos_mailbox_t *mailbox);
+bool mailbox_init(mailbox_t *mailbox, void *storage,
+                  size_t capacity, size_t item_size);
+bool mailbox_send(mailbox_t *mailbox, const void *message, uint32_t timeout_ms);
+bool mailbox_receive(mailbox_t *mailbox, void *message, uint32_t timeout_ms);
+size_t mailbox_message_count(const mailbox_t *mailbox);
 ```
 
 - `mailbox_send`と`mailbox_receive`は、指定したミリ秒の待機時間内に操作できた場合だけ`true`を返す。
 - `mailbox_message_count`は未初期化時に0を返す。
-- `freertos_mailbox_init`は無効な引数およびFreeRTOSが表現できない容量・要素サイズで`false`を返す。呼び出し側は`storage`に少なくとも`capacity * item_size`バイトの静的領域を渡す。
-- `freertos_mailbox_handle`は初期化済みのメールボックスの抽象ハンドルを返す。
+- `mailbox_init`は無効な引数およびFreeRTOSが表現できない容量・要素サイズで`false`を返す。呼び出し側は`storage`に少なくとも`capacity * item_size`バイトの静的領域を渡す。
 - メールボックスと格納領域は、利用するすべてのタスクより長く存続させる。
 
 ## 処理フロー
@@ -73,20 +59,17 @@ mailbox_t *freertos_mailbox_handle(freertos_mailbox_t *mailbox);
 ```mermaid
 sequenceDiagram
     participant Producer as 送信タスク
-    participant Mailbox as lib/concurrency
-    participant Adapter as platform/freertos
+    participant Mailbox as lib/rtos_wrapper
     participant Queue as FreeRTOS Queue
     participant Consumer as 受信タスク
 
     Producer->>Mailbox: mailbox_send(message, timeout_ms)
-    Mailbox->>Adapter: send
-    Adapter->>Queue: xQueueSendToBack
-    Queue-->>Adapter: 成功 / タイムアウト
+    Mailbox->>Queue: xQueueSendToBack
+    Queue-->>Mailbox: 成功 / タイムアウト
     Mailbox-->>Producer: true / false
     Consumer->>Mailbox: mailbox_receive(message, timeout_ms)
-    Mailbox->>Adapter: receive
-    Adapter->>Queue: xQueueReceive
-    Queue-->>Adapter: メッセージ / タイムアウト
+    Mailbox->>Queue: xQueueReceive
+    Queue-->>Mailbox: メッセージ / タイムアウト
     Mailbox-->>Consumer: true / false
 ```
 
@@ -95,7 +78,7 @@ sequenceDiagram
 - 実行コンテキスト: タスクのみ。ISRからは使用しない。
 - FreeRTOS Heapを使用せず、`xQueueCreateStatic`でQueue制御領域とメッセージ格納領域を静的に確保する。
 - タイムアウトは呼び出し側がミリ秒で決定する。低遅延処理では`0`、失ってはならないコマンドでは適切な待機時間を指定する。
-- FreeRTOSアダプタはミリ秒からtickへの変換を64bit演算で行う。結果が有限待機として表現できる最大値以上になる場合は、`portMAX_DELAY - 1` tickへ飽和させる。
+- メールボックスはミリ秒からtickへの変換を64bit演算で行う。結果が有限待機として表現できる最大値以上になる場合は、`portMAX_DELAY - 1` tickへ飽和させる。
 
 ## 検証方法
 

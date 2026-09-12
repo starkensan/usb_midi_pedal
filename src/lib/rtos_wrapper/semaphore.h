@@ -5,16 +5,15 @@
 #include <stddef.h>
 #include <stdint.h>
 
-typedef struct semaphore_operations {
-    bool (*give)(void *context);
-    bool (*take)(void *context, uint32_t timeout_ms);
-} semaphore_operations_t;
+#include "FreeRTOS.h"
+#include "semphr.h"
 
 typedef struct {
-    void *context;
-    const semaphore_operations_t *operations;
+    SemaphoreHandle_t handle;
+    StaticSemaphore_t semaphore_buffer;
 } semaphore_t;
 
+bool semaphore_init(semaphore_t *semaphore, size_t maximum_count, size_t initial_count);
 bool semaphore_give(semaphore_t *semaphore);
 bool semaphore_take(semaphore_t *semaphore, uint32_t timeout_ms);
 

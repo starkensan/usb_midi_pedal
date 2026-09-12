@@ -5,17 +5,15 @@
 #include <stddef.h>
 #include <stdint.h>
 
-typedef struct mailbox_operations {
-    bool (*send)(void *context, const void *message, uint32_t timeout_ms);
-    bool (*receive)(void *context, void *message, uint32_t timeout_ms);
-    size_t (*message_count)(const void *context);
-} mailbox_operations_t;
+#include "FreeRTOS.h"
+#include "queue.h"
 
 typedef struct {
-    void *context;
-    const mailbox_operations_t *operations;
+    QueueHandle_t handle;
+    StaticQueue_t queue_buffer;
 } mailbox_t;
 
+bool mailbox_init(mailbox_t *mailbox, void *storage, size_t capacity, size_t item_size);
 bool mailbox_send(mailbox_t *mailbox, const void *message, uint32_t timeout_ms);
 bool mailbox_receive(mailbox_t *mailbox, void *message, uint32_t timeout_ms);
 size_t mailbox_message_count(const mailbox_t *mailbox);

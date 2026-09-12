@@ -15,7 +15,7 @@ usb_midi_pedal/
 │  └─ decisions/
 ├─ external/                Git submoduleなどの外部依存
 ├─ src/
-│  ├─ app/                  製品固有処理、FreeRTOSタスク、状態管理
+│  ├─ app/                  製品固有処理、タスク、状態管理
 │  │  ├─ app_controller/    状態機械、設定、保存、UIモデル
 │  │  ├─ runtime/           実行設定とペダルイベントの処理
 │  │  └─ tasks/
@@ -26,13 +26,18 @@ usb_midi_pedal/
 │  │  ├─ expression/
 │  │  ├─ flash_storage/
 │  │  ├─ footswitch/
+│  │  ├─ log_output/
 │  │  ├─ rgb_led/
 │  │  └─ usb_midi/
 │  └─ lib/                  ハードウェア非依存の再利用可能な処理
+│     ├─ concurrency/
 │     ├─ graphics/
 │     ├─ input/
 │     ├─ midi/
 │     └─ preset/
+│  └─ platform/             RTOSなど実行基盤へのアダプタ
+│     ├─ freertos/
+│     └─ logging/
 ├─ tests/                   PC上で実行する単体テスト
 │  ├─ lib/
 │  ├─ drivers/
@@ -44,10 +49,10 @@ usb_midi_pedal/
 
 ### `app`
 
-- FreeRTOSタスクの生成と実行
+- 製品固有のタスクの生成と実行
 - Queueやタスク通知による処理の連携
 - 動作モード、画面遷移、プリセット選択などの製品固有処理
-- `lib`と`drivers`の組み合わせ
+- `lib`、`platform`および`drivers`の組み合わせ
 - `app_controller`と`runtime`間のコマンド・返信による制御系と実行系の分離
 
 ### `lib`
@@ -59,6 +64,15 @@ usb_midi_pedal/
 - OLEDへ描画するフレームバッファ処理
 
 `lib`はPico SDK、FreeRTOS、具体的な周辺デバイスに依存させません。
+
+### `platform`
+
+- FreeRTOSなど、実行基盤への依存を隠蔽するアダプタ
+- `lib/concurrency`のメールボックス抽象を実現するFreeRTOS Queue実装
+- タスク間排他を伴う診断ログの整形と出力先の選択
+
+`platform`は`lib`、FreeRTOSおよび必要な`drivers`へ依存できます。製品固有の
+状態やシーケンスは保持しません。
 
 ### `drivers`
 
@@ -85,8 +99,11 @@ Pico SDKやFreeRTOS Kernelなど、プロジェクト外で開発される依存
 ```mermaid
 flowchart LR
     app[app] --> lib[lib]
+    app --> platform[platform]
     app --> drivers[drivers]
-    app --> freertos[FreeRTOS]
+    platform --> lib
+    platform --> drivers
+    platform --> freertos[FreeRTOS]
     drivers --> lib
     drivers --> board[board]
     board --> pico[Pico SDK]
@@ -94,16 +111,18 @@ flowchart LR
 
     classDef internal fill:#e8f1ff,stroke:#2563eb,color:#111827
     classDef external fill:#f3f4f6,stroke:#6b7280,color:#111827
-    class app,lib,drivers internal
+    class app,lib,platform,drivers internal
     class freertos,pico,tinyusb external
 ```
 
 依存方向について、次の規則を設けます。
 
 - `app`は`lib`と`drivers`を利用できます。
+- `app`は`platform`を利用できます。
+- `platform`は共通データ型・抽象APIのために`lib`へ、基盤機能のために`drivers`へ依存できます。
 - `drivers`は共通データ型を利用するために`lib`へ依存できます。
-- `lib`から`app`または`drivers`へ依存してはいけません。
-- FreeRTOS APIは原則として`app`内で使用します。
+- `lib`から`app`、`platform`または`drivers`へ依存してはいけません。
+- 製品固有タスク以外のFreeRTOS機構は、原則として`platform`内に閉じ込めます。
 - Pico SDK APIは`drivers`と`board`内に閉じ込めます。
 - `app_controller`は設定の正本を、`runtime`は有効化済み設定のコピーと演奏中の状態を所有します。
 
@@ -114,6 +133,9 @@ flowchart LR
 | GPIOの読み取り | `drivers/footswitch/` |
 | スイッチのデバウンス計算 | `lib/input/` |
 | 入力を周期的に走査するFreeRTOSタスク | `app/tasks/` |
+| FreeRTOS Queueを用いるメールボックス実装 | `platform/freertos/` |
+| RTOS非依存のメールボックス抽象API | `lib/concurrency/` |
+| USB CDCまたはUARTへのログ実出力 | `drivers/log_output/` |
 | MIDIメッセージの生成 | `lib/midi/` |
 | USB MIDIパケットの送信 | `drivers/usb_midi/` |
 | DIN MIDIバイトの送信 | `drivers/din_midi/` |

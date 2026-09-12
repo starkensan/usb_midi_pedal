@@ -1,4 +1,4 @@
-#include "logging.h"
+#include "platform/logging/logging.h"
 
 #include <stdarg.h>
 #include <stdbool.h>
@@ -8,11 +8,7 @@
 #include "FreeRTOS.h"
 #include "semphr.h"
 
-#include "pico/stdio.h"
-
-#if defined(LOG_CONFIG_OUTPUT_UART)
-#include "debug_uart.h"
-#endif
+#include "drivers/log_output/log_output.h"
 
 enum {
     LOG_BUFFER_SIZE = 256,
@@ -39,21 +35,6 @@ static size_t bounded_length(const char *text, size_t maximum_length)
     return length;
 }
 
-static error_code_t write_output(const char *message, size_t length)
-{
-#if defined(LOG_CONFIG_OUTPUT_USB_CDC)
-    if (fwrite(message, 1U, length, stdout) != length) {
-        return ERROR_CODE_IO;
-    }
-
-    stdio_flush();
-#else
-    debug_uart_write(message, length);
-#endif
-
-    return ERROR_CODE_OK;
-}
-
 error_code_t logging_init(void)
 {
     if (log_mutex != NULL) {
@@ -65,9 +46,7 @@ error_code_t logging_init(void)
         return ERROR_CODE_NOT_READY;
     }
 
-#if defined(LOG_CONFIG_OUTPUT_UART)
-    debug_uart_init();
-#endif
+    log_output_init();
 
     return ERROR_CODE_OK;
 }
@@ -124,7 +103,7 @@ error_code_t logging_vwrite(log_level_t level, const char *format, va_list argum
             buffer[length++] = '\r';
             buffer[length++] = '\n';
             buffer[length] = '\0';
-            const error_code_t result = write_output(buffer, length);
+            const error_code_t result = log_output_write(buffer, length);
             (void)xSemaphoreGive(log_mutex);
             return result;
         }

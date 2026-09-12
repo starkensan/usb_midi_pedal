@@ -26,7 +26,7 @@
 
 ```mermaid
 flowchart LR
-    app[app task] --> abstraction[lib/concurrency]
+    app[app task] --> abstraction[lib/rtos_wrapper]
     abstraction --> adapter[platform/freertos]
     adapter --> eventgroup[FreeRTOS Event Group]
     adapter --> semaphore[FreeRTOS Semaphore]
@@ -78,7 +78,7 @@ mutex_t *freertos_mutex_handle(freertos_mutex_t *mutex);
 ```mermaid
 sequenceDiagram
     participant Producer as 通知タスク
-    participant API as lib/concurrency
+    participant API as lib/rtos_wrapper
     participant Adapter as platform/freertos
     participant Consumer as 待機タスク
 

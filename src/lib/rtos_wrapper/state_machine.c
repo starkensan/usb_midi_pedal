@@ -12,6 +12,17 @@ static const state_machine_state_handler_t *find_handler(const state_machine_t *
     return NULL;
 }
 
+static bool handlers_are_valid(const state_machine_state_handler_t *handlers, size_t handler_count)
+{
+    for (size_t index = 0U; index < handler_count; ++index) {
+        if (handlers[index].callback == NULL) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 bool state_machine_init(state_machine_t *machine,
                         mailbox_t *mailbox,
                         event_flags_t *event_flags,
@@ -22,7 +33,8 @@ bool state_machine_init(state_machine_t *machine,
 {
     if ((machine == NULL) || (mailbox == NULL) || (event_flags == NULL) || (handlers == NULL)
         || (handler_count == 0U) || (state_changed_flags == 0U)
-        || ((state_changed_flags & ~EVENT_FLAGS_USER_BITS_MASK) != 0U)) {
+        || ((state_changed_flags & ~EVENT_FLAGS_USER_BITS_MASK) != 0U)
+        || !handlers_are_valid(handlers, handler_count)) {
         return false;
     }
 

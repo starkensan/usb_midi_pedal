@@ -121,6 +121,11 @@ void test_state_machine_rejects_invalid_setup_and_empty_mailbox(void)
         &machine, &mailbox, &event_flags, 0U, handlers, 1U, STATE_IDLE));
     TEST_ASSERT_FALSE(state_machine_init(
         &machine, &mailbox, &event_flags, UINT32_C(0x01), handlers, 1U, STATE_RUNNING));
+    const state_machine_state_handler_t invalid_handlers[] = {
+        {.state = STATE_IDLE, .callback = NULL, .context = NULL},
+    };
+    TEST_ASSERT_FALSE(state_machine_init(
+        &machine, &mailbox, &event_flags, UINT32_C(0x01), invalid_handlers, 1U, STATE_IDLE));
     TEST_ASSERT_TRUE(state_machine_init(
         &machine, &mailbox, &event_flags, UINT32_C(0x01), handlers, 1U, STATE_IDLE));
     TEST_ASSERT_FALSE(state_machine_process_next(&machine, 0U));

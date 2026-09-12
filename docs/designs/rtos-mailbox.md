@@ -24,13 +24,13 @@
 
 ```mermaid
 flowchart LR
-    producer[送信タスク] --> mailbox[lib/concurrency]
+    producer[送信タスク] --> mailbox[lib/rtos_wrapper]
     mailbox --> queue[FreeRTOS Static Queue]
     queue --> mailbox
     mailbox --> consumer[受信タスク]
 ```
 
-- `lib/concurrency/mailbox`は、静的に確保されたFreeRTOS Queueを用いるメールボックスを提供する。
+- `lib/rtos_wrapper/mailbox`は、静的に確保されたFreeRTOS Queueを用いるメールボックスを提供する。
 - 呼び出し側は`mailbox_t`と、メッセージ型のサイズ×容量分の格納領域を静的に保持する。
 - FreeRTOSは本プロジェクトの固定依存であり、`mailbox_t`はFreeRTOSのQueue型を内部に保持する。
 
@@ -59,7 +59,7 @@ size_t mailbox_message_count(const mailbox_t *mailbox);
 ```mermaid
 sequenceDiagram
     participant Producer as 送信タスク
-    participant Mailbox as lib/concurrency
+    participant Mailbox as lib/rtos_wrapper
     participant Queue as FreeRTOS Queue
     participant Consumer as 受信タスク
 

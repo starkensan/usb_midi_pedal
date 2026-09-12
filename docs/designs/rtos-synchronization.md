@@ -26,12 +26,12 @@
 
 ```mermaid
 flowchart LR
-    app[app task] --> concurrency[lib/concurrency]
-    concurrency --> eventgroup[FreeRTOS Event Group]
-    concurrency --> semaphore[FreeRTOS Semaphore]
+    app[app task] --> rtos_wrapper[lib/rtos_wrapper]
+    rtos_wrapper --> eventgroup[FreeRTOS Event Group]
+    rtos_wrapper --> semaphore[FreeRTOS Semaphore]
 ```
 
-- `lib/concurrency`はFreeRTOSの静的オブジェクトを使う同期機能、無効な引数の検出、共通の型を提供する。
+- `lib/rtos_wrapper`はFreeRTOSの静的オブジェクトを使う同期機能、無効な引数の検出、共通の型を提供する。
 - FreeRTOSは本プロジェクトの固定依存であり、`event_flags_t`、`semaphore_t`、`mutex_t`はFreeRTOSの型を内部に保持する。
 
 ## 公開インターフェース
@@ -71,7 +71,7 @@ bool freertos_mutex_init(mutex_t *mutex);
 ```mermaid
 sequenceDiagram
     participant Producer as 通知タスク
-    participant API as lib/concurrency
+    participant API as lib/rtos_wrapper
     participant Consumer as 待機タスク
 
     Producer->>API: event_flags_set / semaphore_give

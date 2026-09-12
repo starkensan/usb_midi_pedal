@@ -1,9 +1,10 @@
 add_executable(usb_midi_pedal
     main.c
-    lib/concurrency/event_flags.c
-    lib/concurrency/mailbox.c
-    lib/concurrency/mutex.c
-    lib/concurrency/semaphore.c
+    lib/rtos_wrapper/event_flags.c
+    lib/rtos_wrapper/mailbox.c
+    lib/rtos_wrapper/mutex.c
+    lib/rtos_wrapper/semaphore.c
+    lib/rtos_wrapper/state_machine.c
     lib/logging/log_level.c
     lib/logging/logging.c
     drivers/log_output/log_output.c

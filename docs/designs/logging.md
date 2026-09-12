@@ -30,14 +30,16 @@
 
 ```mermaid
 flowchart LR
-    app[アプリケーションタスク] --> logging[app/logging]
-    logging --> uart[drivers/debug_uart]
-    logging --> usb[USB CDC stdio]
+    app[アプリケーションタスク] --> logging[platform/logging]
+    logging --> output[drivers/log_output]
+    output --> uart[drivers/debug_uart]
+    output --> usb[USB CDC stdio]
     config[config/logging.cmake] --> logging
     config --> build[CMake stdio設定]
 ```
 
-- `app/logging` はレベルフィルタ、書式化、タスク間排他、出力先の振り分けを担う。
+- `platform/logging` はレベルフィルタ、書式化、タスク間排他を担う。製品固有の状態や処理シーケンスは持たない。
+- `drivers/log_output` は出力先の選択、USB CDC stdioまたはデバッグUARTの初期化と送信を担う。
 - `drivers/debug_uart` は `board_config.h` が定義する UART0/GP28 の Pico SDK 操作だけを担う。
 - `config/logging.cmake` は出力先と最低出力レベルを定義し、CMake がコンパイル定義と stdio 設定へ変換する。
 

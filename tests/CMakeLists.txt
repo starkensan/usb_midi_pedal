@@ -51,6 +51,18 @@ target_compile_options(test_log_level PRIVATE -Wall -Wextra)
 
 add_test(NAME test_log_level COMMAND test_log_level)
 
+add_executable(test_mailbox
+    test_mailbox.c
+    ${PROJECT_SOURCE_DIR}/src/lib/concurrency/mailbox.c
+)
+target_include_directories(test_mailbox PRIVATE
+    ${PROJECT_SOURCE_DIR}/src/lib/concurrency
+)
+target_link_libraries(test_mailbox PRIVATE unity::framework)
+target_compile_options(test_mailbox PRIVATE -Wall -Wextra -Werror)
+
+add_test(NAME test_mailbox COMMAND test_mailbox)
+
 add_executable(app_state_machine_test
     app/app_state_machine_test.c
     ${PROJECT_SOURCE_DIR}/src/app/app_controller/app_state_machine.c

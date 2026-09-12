@@ -4,7 +4,7 @@
 #include "board/board_config.h"
 #include "drivers/rgb_led/rgb_led.h"
 #include "drivers/usb_cdc/usb_cdc.h"
-#include "logging.h"
+#include "platform/logging/logging.h"
 #include "pico/stdlib.h"
 
 enum {

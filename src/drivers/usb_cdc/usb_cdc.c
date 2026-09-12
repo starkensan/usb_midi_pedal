@@ -22,6 +22,11 @@ bool usb_cdc_write(const char *message, size_t length)
         return false;
     }
 
+    if (tud_cdc_n_write_available(0U) < length) {
+        usb_midi_tinyusb_unlock();
+        return false;
+    }
+
     const uint32_t written = tud_cdc_n_write(0U, message, (uint32_t)length);
     if (written == length) {
         (void)tud_cdc_n_write_flush(0U);

@@ -63,7 +63,7 @@ sequenceDiagram
     Driver->>Driver: 範囲検証
     Driver->>TinyUSB: tud_midi_stream_write
     loop 1 ms task
-        Driver->>TinyUSB: tud_task
+        Driver->>TinyUSB: tud_task_ext(0U, false)
     end
     TinyUSB-->>Host: USB MIDI IN endpoint
 ```
@@ -75,6 +75,7 @@ sequenceDiagram
 - USBデバイス記述子はIAD複合デバイスのクラス値を使用し、PIDはCDCとMIDIの複合構成を示す`0x4009`とする。
 - 送信関数はブロックしない。送信バッファ満杯時は`false`を返す。
 - ミューテックスの取得に失敗した場合も送信関数は`false`を返す。ISRから送信関数を呼び出さない。
+- USBサービスは待機なしの`tud_task_ext(0U, false)`を呼び出すため、ミューテックスを保持したままUSBイベントを待機しない。
 
 ## 検証方法
 

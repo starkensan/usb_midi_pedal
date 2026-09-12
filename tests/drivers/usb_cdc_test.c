@@ -6,6 +6,7 @@
 
 static bool lock_result;
 static uint32_t write_result;
+static uint32_t write_available;
 static uint32_t write_count;
 static uint32_t flush_count;
 static uint8_t last_interface_number;
@@ -35,10 +36,17 @@ uint32_t tud_cdc_n_write_flush(uint8_t interface_number)
     return 0U;
 }
 
+uint32_t tud_cdc_n_write_available(uint8_t interface_number)
+{
+    last_interface_number = interface_number;
+    return write_available;
+}
+
 void setUp(void)
 {
     lock_result = true;
     write_result = 0U;
+    write_available = UINT32_MAX;
     write_count = 0U;
     flush_count = 0U;
     last_interface_number = 0U;
@@ -81,11 +89,21 @@ void test_usb_cdc_rejects_partial_writes(void)
     TEST_ASSERT_EQUAL_UINT32(0U, flush_count);
 }
 
+void test_usb_cdc_rejects_writes_that_do_not_fit_in_the_tx_fifo(void)
+{
+    write_available = 2U;
+
+    TEST_ASSERT_FALSE(usb_cdc_write("log", 3U));
+    TEST_ASSERT_EQUAL_UINT32(0U, write_count);
+    TEST_ASSERT_EQUAL_UINT32(0U, flush_count);
+}
+
 int main(void)
 {
     UNITY_BEGIN();
     RUN_TEST(test_usb_cdc_initializes_and_writes_while_holding_tinyusb_lock);
     RUN_TEST(test_usb_cdc_rejects_writes_when_tinyusb_is_busy);
     RUN_TEST(test_usb_cdc_rejects_partial_writes);
+    RUN_TEST(test_usb_cdc_rejects_writes_that_do_not_fit_in_the_tx_fifo);
     return UNITY_END();
 }

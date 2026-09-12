@@ -8,26 +8,36 @@ add_executable(usb_midi_pedal
     platform/logging/logging.c
     drivers/debug_uart/debug_uart.c
     drivers/usb_cdc/usb_cdc.c
+    drivers/usb_midi/usb_midi.c
+    drivers/usb_midi/usb_midi_descriptors.c
     app/app_controller/app_state_machine.c
 )
+
+if(LOG_OUTPUT STREQUAL "USB_CDC")
+    message(FATAL_ERROR "LOG_OUTPUT=USB_CDC is incompatible with the USB MIDI-only device configuration")
+endif()
 
 target_include_directories(usb_midi_pedal PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}
     ${CMAKE_CURRENT_LIST_DIR}/drivers/debug_uart
     ${CMAKE_CURRENT_LIST_DIR}/drivers/log_output
     ${CMAKE_CURRENT_LIST_DIR}/drivers/usb_cdc
+    ${CMAKE_CURRENT_LIST_DIR}/drivers/usb_midi
     ${CMAKE_CURRENT_LIST_DIR}/lib/logging
 )
 
 target_link_libraries(usb_midi_pedal PRIVATE
     pico_stdlib
+    pico_unique_id
     FreeRTOS-Kernel-Static
+    tinyusb_device
     hardware_i2c
     hardware_uart
 )
 
 target_include_directories(usb_midi_pedal PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}/inc
+    ${PROJECT_SOURCE_DIR}/config
 )
 
 target_compile_options(usb_midi_pedal PRIVATE

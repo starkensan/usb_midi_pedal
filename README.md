@@ -104,4 +104,4 @@ PowerShellまたはWSLターミナルを1つずつ起動します。
 - [x] Pimoroni Tiny 2040公式ボード定義の選択
 - [x] 最小FreeRTOS起動とRGB LED点滅タスク
 - [x] プロジェクト固有のピン定義
-- [ ] USB MIDI実装
+- [x] USB MIDI OUT実装（Program Change、Control Change）

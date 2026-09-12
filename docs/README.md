@@ -15,6 +15,7 @@
 | 作成済み | [designs/runtime-architecture.md](designs/runtime-architecture.md) | 状態機械、タスク、モジュール境界、保存、将来のデュアルコア移行方針 |
 | 作成済み | [designs/rtos-mailbox.md](designs/rtos-mailbox.md) | FreeRTOSタスク間で固定長メッセージを受け渡す静的メールボックス |
 | 作成済み | [designs/rtos-synchronization.md](designs/rtos-synchronization.md) | Event Flag、Semaphore、Mutexによる静的なRTOS同期機能 |
+| 作成済み | [designs/rtos-event-state-machine.md](designs/rtos-event-state-machine.md) | mailboxとEvent Flagを用いる汎用ステートマシン |
 | 作成済み | [designs/operation-state-machine.md](designs/operation-state-machine.md) | 操作状態の遷移と副作用の通知 |
 | 作成済み | [designs/wsl-usb-auto-attach.md](designs/wsl-usb-auto-attach.md) | WSLにUSBデバイスを継続的に自動attachする開発補助スクリプト |
 | 作成済み | [rules/README.md](rules/README.md) | 実装、検証、ドキュメント、GitHub運用の作業ルール |

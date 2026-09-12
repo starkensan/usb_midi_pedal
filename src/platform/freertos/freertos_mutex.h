@@ -6,7 +6,7 @@
 #include "FreeRTOS.h"
 #include "semphr.h"
 
-#include "lib/concurrency/mutex.h"
+#include "lib/rtos_wrapper/mutex.h"
 
 typedef struct {
     SemaphoreHandle_t handle;

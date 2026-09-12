@@ -6,7 +6,7 @@
 #include "FreeRTOS.h"
 #include "event_groups.h"
 
-#include "lib/concurrency/event_flags.h"
+#include "lib/rtos_wrapper/event_flags.h"
 
 typedef struct {
     EventGroupHandle_t handle;

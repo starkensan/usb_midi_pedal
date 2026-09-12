@@ -53,10 +53,10 @@ add_test(NAME test_log_level COMMAND test_log_level)
 
 add_executable(test_mailbox
     test_mailbox.c
-    ${PROJECT_SOURCE_DIR}/src/lib/concurrency/mailbox.c
+    ${PROJECT_SOURCE_DIR}/src/lib/rtos_wrapper/mailbox.c
 )
 target_include_directories(test_mailbox PRIVATE
-    ${PROJECT_SOURCE_DIR}/src/lib/concurrency
+    ${PROJECT_SOURCE_DIR}/src/lib/rtos_wrapper
 )
 target_link_libraries(test_mailbox PRIVATE unity::framework)
 target_compile_options(test_mailbox PRIVATE -Wall -Wextra -Werror)
@@ -65,10 +65,10 @@ add_test(NAME test_mailbox COMMAND test_mailbox)
 
 add_executable(test_event_flags
     test_event_flags.c
-    ${PROJECT_SOURCE_DIR}/src/lib/concurrency/event_flags.c
+    ${PROJECT_SOURCE_DIR}/src/lib/rtos_wrapper/event_flags.c
 )
 target_include_directories(test_event_flags PRIVATE
-    ${PROJECT_SOURCE_DIR}/src/lib/concurrency
+    ${PROJECT_SOURCE_DIR}/src/lib/rtos_wrapper
 )
 target_link_libraries(test_event_flags PRIVATE unity::framework)
 target_compile_options(test_event_flags PRIVATE -Wall -Wextra -Werror)
@@ -77,10 +77,10 @@ add_test(NAME test_event_flags COMMAND test_event_flags)
 
 add_executable(test_semaphore
     test_semaphore.c
-    ${PROJECT_SOURCE_DIR}/src/lib/concurrency/semaphore.c
+    ${PROJECT_SOURCE_DIR}/src/lib/rtos_wrapper/semaphore.c
 )
 target_include_directories(test_semaphore PRIVATE
-    ${PROJECT_SOURCE_DIR}/src/lib/concurrency
+    ${PROJECT_SOURCE_DIR}/src/lib/rtos_wrapper
 )
 target_link_libraries(test_semaphore PRIVATE unity::framework)
 target_compile_options(test_semaphore PRIVATE -Wall -Wextra -Werror)
@@ -89,15 +89,29 @@ add_test(NAME test_semaphore COMMAND test_semaphore)
 
 add_executable(test_mutex
     test_mutex.c
-    ${PROJECT_SOURCE_DIR}/src/lib/concurrency/mutex.c
+    ${PROJECT_SOURCE_DIR}/src/lib/rtos_wrapper/mutex.c
 )
 target_include_directories(test_mutex PRIVATE
-    ${PROJECT_SOURCE_DIR}/src/lib/concurrency
+    ${PROJECT_SOURCE_DIR}/src/lib/rtos_wrapper
 )
 target_link_libraries(test_mutex PRIVATE unity::framework)
 target_compile_options(test_mutex PRIVATE -Wall -Wextra -Werror)
 
 add_test(NAME test_mutex COMMAND test_mutex)
+
+add_executable(test_state_machine
+    test_state_machine.c
+    ${PROJECT_SOURCE_DIR}/src/lib/rtos_wrapper/state_machine.c
+    ${PROJECT_SOURCE_DIR}/src/lib/rtos_wrapper/mailbox.c
+    ${PROJECT_SOURCE_DIR}/src/lib/rtos_wrapper/event_flags.c
+)
+target_include_directories(test_state_machine PRIVATE
+    ${PROJECT_SOURCE_DIR}/src/lib/rtos_wrapper
+)
+target_link_libraries(test_state_machine PRIVATE unity::framework)
+target_compile_options(test_state_machine PRIVATE -Wall -Wextra -Werror)
+
+add_test(NAME test_state_machine COMMAND test_state_machine)
 
 add_executable(app_state_machine_test
     app/app_state_machine_test.c

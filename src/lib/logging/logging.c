@@ -1,6 +1,5 @@
-#include "platform/logging/logging.h"
+#include "lib/logging/logging.h"
 
-#include <stdarg.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -93,10 +92,7 @@ error_code_t logging_vwrite(log_level_t level, const char *format, va_list argum
     prefix_length = snprintf(buffer, sizeof(buffer), "[%s] ", level_names[level]);
     if (prefix_length > 0 && (size_t)prefix_length < sizeof(buffer)) {
         message_length = vsnprintf(
-            &buffer[prefix_length],
-            sizeof(buffer) - (size_t)prefix_length - 2U,
-            format,
-            arguments);
+            &buffer[prefix_length], sizeof(buffer) - (size_t)prefix_length - 2U, format, arguments);
 
         if (message_length >= 0) {
             length = bounded_length(buffer, sizeof(buffer) - 2U);

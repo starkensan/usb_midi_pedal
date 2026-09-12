@@ -5,13 +5,9 @@ add_executable(usb_midi_pedal
     lib/concurrency/mutex.c
     lib/concurrency/semaphore.c
     lib/logging/log_level.c
+    lib/logging/logging.c
     drivers/log_output/log_output.c
     drivers/rgb_led/rgb_led.c
-    platform/freertos/freertos_event_flags.c
-    platform/freertos/freertos_mailbox.c
-    platform/freertos/freertos_mutex.c
-    platform/freertos/freertos_semaphore.c
-    platform/logging/logging.c
     drivers/debug_uart/debug_uart.c
     drivers/usb_cdc/usb_cdc.c
     app/app_controller/app_state_machine.c

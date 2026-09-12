@@ -5,16 +5,15 @@
 #include <stddef.h>
 #include <stdint.h>
 
-typedef struct mutex_operations {
-    bool (*lock)(void *context, uint32_t timeout_ms);
-    bool (*unlock)(void *context);
-} mutex_operations_t;
+#include "FreeRTOS.h"
+#include "semphr.h"
 
 typedef struct {
-    void *context;
-    const mutex_operations_t *operations;
+    SemaphoreHandle_t handle;
+    StaticSemaphore_t mutex_buffer;
 } mutex_t;
 
+bool freertos_mutex_init(mutex_t *mutex);
 bool mutex_lock(mutex_t *mutex, uint32_t timeout_ms);
 bool mutex_unlock(mutex_t *mutex);
 

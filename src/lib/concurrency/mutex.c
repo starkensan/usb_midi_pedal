@@ -1,21 +1,31 @@
 #include "mutex.h"
 
-bool mutex_lock(mutex_t *mutex, uint32_t timeout_ms)
+#include "freertos_timeout.h"
+
+bool freertos_mutex_init(mutex_t *mutex)
 {
-    if ((mutex == NULL) || (mutex->context == NULL) || (mutex->operations == NULL)
-        || (mutex->operations->lock == NULL)) {
+    if (mutex == NULL) {
         return false;
     }
 
-    return mutex->operations->lock(mutex->context, timeout_ms);
+    mutex->handle = xSemaphoreCreateMutexStatic(&mutex->mutex_buffer);
+    return mutex->handle != NULL;
+}
+
+bool mutex_lock(mutex_t *mutex, uint32_t timeout_ms)
+{
+    if ((mutex == NULL) || (mutex->handle == NULL)) {
+        return false;
+    }
+
+    return xSemaphoreTake(mutex->handle, freertos_timeout_ms_to_ticks(timeout_ms)) == pdPASS;
 }
 
 bool mutex_unlock(mutex_t *mutex)
 {
-    if ((mutex == NULL) || (mutex->context == NULL) || (mutex->operations == NULL)
-        || (mutex->operations->unlock == NULL)) {
+    if ((mutex == NULL) || (mutex->handle == NULL)) {
         return false;
     }
 
-    return mutex->operations->unlock(mutex->context);
+    return xSemaphoreGive(mutex->handle) == pdPASS;
 }

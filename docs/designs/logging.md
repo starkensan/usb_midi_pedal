@@ -30,7 +30,7 @@
 
 ```mermaid
 flowchart LR
-    app[アプリケーションタスク] --> logging[platform/logging]
+    app[アプリケーションタスク] --> logging[lib/logging]
     logging --> output[drivers/log_output]
     output --> uart[drivers/debug_uart]
     output --> usb[USB CDC stdio]
@@ -38,7 +38,7 @@ flowchart LR
     config --> build[CMake stdio設定]
 ```
 
-- `platform/logging` はレベルフィルタ、書式化、タスク間排他を担う。製品固有の状態や処理シーケンスは持たない。
+- `lib/logging` はレベルフィルタ、書式化、FreeRTOS Mutexによるタスク間排他、および出力ドライバの利用を担う。製品固有の状態や処理シーケンスは持たない。
 - `drivers/log_output` は出力先の選択、USB CDC stdioまたはデバッグUARTの初期化と送信を担う。
 - `drivers/debug_uart` は `board_config.h` が定義する UART0/GP28 の Pico SDK 操作だけを担う。
 - `config/logging.cmake` は出力先と最低出力レベルを定義し、CMake がコンパイル定義と stdio 設定へ変換する。
@@ -64,7 +64,7 @@ error_code_t logging_init(void);
 error_code_t logging_write(log_level_t level, const char *format, ...);
 ```
 
-- `log_level_t` とその有効性・出力判定は、ハードウェア非依存の `lib/logging` に配置する。
+- `log_level_t` とその有効性・出力判定は `lib/logging` に配置する。`lib/logging`はPico SDKを直接利用せず、出力には`drivers/log_output`を使用する。
 - `LOG_ERROR`、`LOG_WARN`、`LOG_INFO`、`LOG_DEBUG` は `logging_write` を呼ぶマクロであり、`error_code_t` を返す。
 - `logging_init` はスケジューラ開始前に一度だけ呼ぶ。
 - API はタスクコンテキスト専用であり、ISR から呼んではならない。

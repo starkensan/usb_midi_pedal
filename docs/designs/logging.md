@@ -98,6 +98,7 @@ sequenceDiagram
 - USB CDCはTinyUSB APIを直接使用する。USB MIDIドライバの静的FreeRTOSミューテックスにより、
   CDC送信とTinyUSBサービス処理を直列化する。
 - `app/tasks/usb_midi_task.c`が1 ms周期でTinyUSBを処理する複合デバイス共通の唯一のサービス・タスクである。
+- CDC送信バッファは256 byteとし、ログ行の最大長（256 byte）を一度に格納できるようにする。
 
 ## テスト方針
 

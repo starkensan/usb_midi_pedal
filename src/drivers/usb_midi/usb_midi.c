@@ -46,7 +46,7 @@ void usb_midi_service(void)
         return;
     }
 
-    tud_task();
+    tud_task_ext(0U, false);
     usb_midi_tinyusb_unlock();
 }
 

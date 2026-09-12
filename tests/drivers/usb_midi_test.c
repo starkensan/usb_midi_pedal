@@ -13,6 +13,8 @@ static uint32_t write_count;
 static uint8_t last_cable_number;
 static uint8_t last_message[3];
 static uint32_t service_count;
+static uint32_t service_timeout_ms;
+static bool service_in_isr;
 static bool mutex_take_result;
 static uint32_t mutex_take_count;
 static uint32_t mutex_give_count;
@@ -42,9 +44,11 @@ bool tusb_init(void)
     return init_result;
 }
 
-void tud_task(void)
+void tud_task_ext(uint32_t timeout_ms, bool in_isr)
 {
     ++service_count;
+    service_timeout_ms = timeout_ms;
+    service_in_isr = in_isr;
 }
 
 bool tud_midi_mounted(void)
@@ -69,6 +73,8 @@ void setUp(void)
     last_cable_number = 0U;
     (void)memset(last_message, 0, sizeof(last_message));
     service_count = 0U;
+    service_timeout_ms = 1U;
+    service_in_isr = true;
     mutex_take_result = true;
     mutex_take_count = 0U;
     mutex_give_count = 0U;
@@ -88,6 +94,8 @@ void test_usb_midi_initializes_services_and_reports_connection(void)
 
     usb_midi_service();
     TEST_ASSERT_EQUAL_UINT32(1U, service_count);
+    TEST_ASSERT_EQUAL_UINT32(0U, service_timeout_ms);
+    TEST_ASSERT_FALSE(service_in_isr);
 
     TEST_ASSERT_FALSE(usb_midi_is_connected());
     mounted = true;

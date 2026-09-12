@@ -4,6 +4,5 @@
 #include <stdbool.h>
 
 bool usb_cdc_init(void);
-void usb_cdc_service(void);
 
 #endif

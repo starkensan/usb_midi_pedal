@@ -33,6 +33,7 @@ flowchart LR
 
 - `drivers/usb_midi/`はUSB MIDIの初期化、記述子、およびMIDIメッセージをTinyUSBの送信バッファへ渡す責務を持つ。
 - `app/tasks/usb_midi_task.c`の専用タスクが`usb_midi_service()`を周期実行する。
+- USB CDCログ用に別途TinyUSBのサービス処理は実行しない。USB MIDIサービス・タスクが複合デバイス全体を処理する。
 - 呼び出し側はメッセージの送信時機と再試行を管理する。
 
 ## 公開インターフェース
@@ -48,6 +49,7 @@ bool usb_midi_send_control_change(uint8_t channel, uint8_t controller, uint8_t v
 - `channel`は0から15、Program Changeの`program`、Control Changeの`controller`と`value`は0から127を受け付ける。
 - 値が範囲外の場合、またはTinyUSBの送信バッファへ全バイトを書き込めない場合は`false`を返す。
 - `usb_midi_service()`はタスク文脈からのみ呼び出し、ISRからは呼び出さない。
+- 送信、接続状態の取得、および`usb_midi_service()`は同一の静的FreeRTOSミューテックスで直列化する。したがって、実行時タスクから送信してもTinyUSB APIが並行実行されない。
 
 ## 処理フロー
 
@@ -72,6 +74,7 @@ sequenceDiagram
 - USBはMIDIとCDCの複合デバイスとして列挙される。`LOG_OUTPUT=USB_CDC`を選ぶと、CDCを診断ログ出力に使用する。
 - USBデバイス記述子はIAD複合デバイスのクラス値を使用し、PIDはCDCとMIDIの複合構成を示す`0x4009`とする。
 - 送信関数はブロックしない。送信バッファ満杯時は`false`を返す。
+- ミューテックスの取得に失敗した場合も送信関数は`false`を返す。ISRから送信関数を呼び出さない。
 
 ## 検証方法
 

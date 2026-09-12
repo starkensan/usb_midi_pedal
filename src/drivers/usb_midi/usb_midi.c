@@ -1,5 +1,9 @@
 #include "usb_midi.h"
 
+#include <stddef.h>
+
+#include "FreeRTOS.h"
+#include "semphr.h"
 #include "tusb.h"
 
 enum {
@@ -10,19 +14,50 @@ enum {
     MIDI_STATUS_CONTROL_CHANGE = 0xB0U,
 };
 
+static StaticSemaphore_t tinyusb_mutex_storage;
+static SemaphoreHandle_t tinyusb_mutex;
+
+static bool tinyusb_lock(void)
+{
+    return tinyusb_mutex != NULL && xSemaphoreTake(tinyusb_mutex, 0U) == pdTRUE;
+}
+
+static void tinyusb_unlock(void)
+{
+    (void)xSemaphoreGive(tinyusb_mutex);
+}
+
 bool usb_midi_init(void)
 {
+    if (tinyusb_mutex == NULL) {
+        tinyusb_mutex = xSemaphoreCreateMutexStatic(&tinyusb_mutex_storage);
+        if (tinyusb_mutex == NULL) {
+            return false;
+        }
+    }
+
     return tusb_init();
 }
 
 void usb_midi_service(void)
 {
+    if (!tinyusb_lock()) {
+        return;
+    }
+
     tud_task();
+    tinyusb_unlock();
 }
 
 bool usb_midi_is_connected(void)
 {
-    return tud_midi_mounted();
+    if (!tinyusb_lock()) {
+        return false;
+    }
+
+    const bool connected = tud_midi_mounted();
+    tinyusb_unlock();
+    return connected;
 }
 
 bool usb_midi_send_program_change(uint8_t channel, uint8_t program)
@@ -36,7 +71,14 @@ bool usb_midi_send_program_change(uint8_t channel, uint8_t program)
         return false;
     }
 
-    return tud_midi_stream_write(USB_MIDI_CABLE_NUMBER, message, sizeof(message)) == sizeof(message);
+    if (!tinyusb_lock()) {
+        return false;
+    }
+
+    const bool sent =
+        tud_midi_stream_write(USB_MIDI_CABLE_NUMBER, message, sizeof(message)) == sizeof(message);
+    tinyusb_unlock();
+    return sent;
 }
 
 bool usb_midi_send_control_change(uint8_t channel, uint8_t controller, uint8_t value)
@@ -51,5 +93,12 @@ bool usb_midi_send_control_change(uint8_t channel, uint8_t controller, uint8_t v
         return false;
     }
 
-    return tud_midi_stream_write(USB_MIDI_CABLE_NUMBER, message, sizeof(message)) == sizeof(message);
+    if (!tinyusb_lock()) {
+        return false;
+    }
+
+    const bool sent =
+        tud_midi_stream_write(USB_MIDI_CABLE_NUMBER, message, sizeof(message)) == sizeof(message);
+    tinyusb_unlock();
+    return sent;
 }

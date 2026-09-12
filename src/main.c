@@ -1,6 +1,8 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
+#include <stdbool.h>
+
 #include "app/tasks/usb_midi_task.h"
 #include "board/board_config.h"
 #include "drivers/rgb_led/rgb_led.h"
@@ -69,8 +71,15 @@ int main(void)
         &heartbeat_task_buffer);
 
     configASSERT(heartbeat != NULL);
+    if (heartbeat == NULL) {
+        return 1;
+    }
 
-    configASSERT(usb_midi_task_start());
+    const bool usb_midi_task_started = usb_midi_task_start();
+    configASSERT(usb_midi_task_started);
+    if (!usb_midi_task_started) {
+        return 1;
+    }
 
     vTaskStartScheduler();
 

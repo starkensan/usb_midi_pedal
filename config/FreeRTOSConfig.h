@@ -30,6 +30,7 @@
 #define configKERNEL_PROVIDED_STATIC_MEMORY     1
 
 /* Synchronization and software timers. */
+#define configUSE_EVENT_GROUPS                 1
 #define configUSE_MUTEXES                       1
 #define configUSE_RECURSIVE_MUTEXES             1
 #define configUSE_COUNTING_SEMAPHORES           1

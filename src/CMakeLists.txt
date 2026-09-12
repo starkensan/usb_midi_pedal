@@ -11,11 +11,8 @@ add_executable(usb_midi_pedal
     drivers/usb_midi/usb_midi.c
     drivers/usb_midi/usb_midi_descriptors.c
     app/app_controller/app_state_machine.c
+    app/tasks/usb_midi_task.c
 )
-
-if(LOG_OUTPUT STREQUAL "USB_CDC")
-    message(FATAL_ERROR "LOG_OUTPUT=USB_CDC is incompatible with the USB MIDI-only device configuration")
-endif()
 
 target_include_directories(usb_midi_pedal PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}
@@ -23,6 +20,7 @@ target_include_directories(usb_midi_pedal PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}/drivers/log_output
     ${CMAKE_CURRENT_LIST_DIR}/drivers/usb_cdc
     ${CMAKE_CURRENT_LIST_DIR}/drivers/usb_midi
+    ${CMAKE_CURRENT_LIST_DIR}/app/tasks
     ${CMAKE_CURRENT_LIST_DIR}/lib/logging
 )
 
@@ -49,6 +47,7 @@ if(LOG_OUTPUT STREQUAL "USB_CDC")
     target_compile_definitions(usb_midi_pedal PRIVATE
         LOG_CONFIG_OUTPUT_USB_CDC
         PICO_STDIO_USB_ENABLE_IRQ_BACKGROUND_TASK=0
+        PICO_STDIO_USB_ENABLE_TINYUSB_INIT=0
     )
     pico_enable_stdio_usb(usb_midi_pedal 1)
     pico_enable_stdio_uart(usb_midi_pedal 0)

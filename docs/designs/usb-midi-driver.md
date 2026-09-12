@@ -19,20 +19,20 @@
 
 - MIDI IN、MIDI THRU、USB MIDIからDIN MIDIへのスルー
 - MIDIメッセージのマッピングおよび送信スケジューリング
-- USB CDCによる診断ログ出力
+- USB CDCログの送受信処理
 
 ## 責務と依存関係
 
 ```mermaid
 flowchart LR
     runtime[Runtime] --> driver[drivers/usb_midi]
-    task[USB MIDI service task] --> driver
+    task[app/tasks USB service task] --> driver
     driver --> tinyusb[TinyUSB device stack]
     tinyusb --> host[USB host]
 ```
 
 - `drivers/usb_midi/`はUSB MIDIの初期化、記述子、およびMIDIメッセージをTinyUSBの送信バッファへ渡す責務を持つ。
-- `main.c`の専用タスクが`usb_midi_service()`を周期実行する。
+- `app/tasks/usb_midi_task.c`の専用タスクが`usb_midi_service()`を周期実行する。
 - 呼び出し側はメッセージの送信時機と再試行を管理する。
 
 ## 公開インターフェース
@@ -69,7 +69,7 @@ sequenceDiagram
 ## RTOS・ハードウェア上の考慮
 
 - TinyUSBはPico SDK構成で初期化し、USB MIDI送信バッファは64 byteに固定する。
-- USBはMIDIクラス専用であり、USB CDCログ出力との同時使用は対象外とする。
+- USBはMIDIとCDCの複合デバイスとして列挙される。`LOG_OUTPUT=USB_CDC`を選ぶと、CDCを診断ログ出力に使用する。
 - 送信関数はブロックしない。送信バッファ満杯時は`false`を返す。
 
 ## 検証方法

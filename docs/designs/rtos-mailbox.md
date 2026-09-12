@@ -24,7 +24,7 @@
 
 ```mermaid
 flowchart LR
-    producer[送信タスク] --> mailbox[lib/concurrency]
+    producer[送信タスク] --> mailbox[lib/rtos_wrapper]
     mailbox --> adapter[platform/freertos]
     adapter --> queue[FreeRTOS Static Queue]
     queue --> adapter
@@ -32,7 +32,7 @@ flowchart LR
     mailbox --> consumer[受信タスク]
 ```
 
-- `lib/concurrency/mailbox`は、実行基盤に依存しないメールボックス抽象APIを提供する。
+- `lib/rtos_wrapper/mailbox`は、実行基盤に依存しないメールボックス抽象APIを提供する。
 - `platform/freertos/freertos_mailbox`は、静的に確保されたFreeRTOS Queueを用いて抽象APIを実現する。
 - 呼び出し側は`freertos_mailbox_t`と、メッセージ型のサイズ×容量分の格納領域を静的に保持する。
 - `app`は`mailbox_t`だけを使用し、FreeRTOS APIを直接使用しない。
@@ -73,7 +73,7 @@ mailbox_t *freertos_mailbox_handle(freertos_mailbox_t *mailbox);
 ```mermaid
 sequenceDiagram
     participant Producer as 送信タスク
-    participant Mailbox as lib/concurrency
+    participant Mailbox as lib/rtos_wrapper
     participant Adapter as platform/freertos
     participant Queue as FreeRTOS Queue
     participant Consumer as 受信タスク

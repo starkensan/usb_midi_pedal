@@ -7,7 +7,7 @@
 #include "FreeRTOS.h"
 #include "semphr.h"
 
-#include "lib/concurrency/semaphore.h"
+#include "lib/rtos_wrapper/semaphore.h"
 
 typedef struct {
     SemaphoreHandle_t handle;

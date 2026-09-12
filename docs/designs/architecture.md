@@ -30,7 +30,7 @@ usb_midi_pedal/
 │  │  ├─ rgb_led/
 │  │  └─ usb_midi/
 │  └─ lib/                  ハードウェア非依存の再利用可能な処理
-│     ├─ concurrency/
+│     ├─ rtos_wrapper/
 │     ├─ graphics/
 │     ├─ input/
 │     ├─ midi/
@@ -68,7 +68,7 @@ usb_midi_pedal/
 ### `platform`
 
 - FreeRTOSなど、実行基盤への依存を隠蔽するアダプタ
-- `lib/concurrency`のメールボックスと同期機能の抽象を実現するFreeRTOS実装
+- `lib/rtos_wrapper`のメールボックスと同期機能の抽象を実現するFreeRTOS実装
 - タスク間排他を伴う診断ログの整形と出力先の選択
 
 `platform`は`lib`、FreeRTOSおよび必要な`drivers`へ依存できます。製品固有の
@@ -135,7 +135,7 @@ flowchart LR
 | 入力を周期的に走査するFreeRTOSタスク | `app/tasks/` |
 | FreeRTOS Queueを用いるメールボックス実装 | `platform/freertos/` |
 | FreeRTOS Event Group、Semaphore、Mutexを用いる同期機能実装 | `platform/freertos/` |
-| RTOS非依存のメールボックス抽象API | `lib/concurrency/` |
+| RTOS非依存のメールボックス、同期、状態機械API | `lib/rtos_wrapper/` |
 | USB CDCまたはUARTへのログ実出力 | `drivers/log_output/` |
 | MIDIメッセージの生成 | `lib/midi/` |
 | USB MIDIパケットの送信 | `drivers/usb_midi/` |

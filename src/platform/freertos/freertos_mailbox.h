@@ -7,7 +7,7 @@
 #include "FreeRTOS.h"
 #include "queue.h"
 
-#include "lib/concurrency/mailbox.h"
+#include "lib/rtos_wrapper/mailbox.h"
 
 typedef struct {
     QueueHandle_t handle;

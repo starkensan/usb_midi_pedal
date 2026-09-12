@@ -32,7 +32,7 @@ flowchart LR
     adapter --> semaphore[FreeRTOS Semaphore]
 ```
 
-- `lib/concurrency`はRTOS非依存の抽象API、無効な引数の検出、共通の型を提供する。
+- `lib/rtos_wrapper`はRTOS非依存の抽象API、無効な引数の検出、共通の型を提供する。
 - `platform/freertos`は抽象APIをFreeRTOSの静的オブジェクトへ接続する。
 - `app`は`event_flags_t`、`semaphore_t`、`mutex_t`だけを使用し、FreeRTOS APIを直接使用しない。
 

@@ -1,30 +1,19 @@
 #include "platform/freertos/freertos_mailbox.h"
 
-#include <stdint.h>
-
-static TickType_t timeout_ms_to_ticks(uint32_t timeout_ms)
-{
-    const uint64_t ticks = ((uint64_t)timeout_ms * (uint64_t)configTICK_RATE_HZ) / UINT64_C(1000);
-
-    if (ticks >= (uint64_t)portMAX_DELAY) {
-        return portMAX_DELAY - (TickType_t)1U;
-    }
-
-    return (TickType_t)ticks;
-}
+#include "platform/freertos/freertos_timeout.h"
 
 static bool freertos_mailbox_send(void *context, const void *message, uint32_t timeout_ms)
 {
     freertos_mailbox_t *mailbox = context;
 
-    return xQueueSendToBack(mailbox->handle, message, timeout_ms_to_ticks(timeout_ms)) == pdPASS;
+    return xQueueSendToBack(mailbox->handle, message, freertos_timeout_ms_to_ticks(timeout_ms)) == pdPASS;
 }
 
 static bool freertos_mailbox_receive(void *context, void *message, uint32_t timeout_ms)
 {
     freertos_mailbox_t *mailbox = context;
 
-    return xQueueReceive(mailbox->handle, message, timeout_ms_to_ticks(timeout_ms)) == pdPASS;
+    return xQueueReceive(mailbox->handle, message, freertos_timeout_ms_to_ticks(timeout_ms)) == pdPASS;
 }
 
 static size_t freertos_mailbox_message_count(const void *context)

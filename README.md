@@ -67,17 +67,22 @@ cmake --build --preset debug
 
 Windows上のWSL 2でTiny 2040またはCMSIS-DAPデバッグプローブを使用する場合は、
 `usbipd-win`で各デバイスを一度共有した後に、自動attachスクリプトを起動します。
-共有には管理者権限が必要ですが、自動attachの開始には不要です。
+共有には管理者権限が必要ですが、自動attachの開始には不要です。WSLから起動する場合は
+次のBashスクリプトを使用します。
 
 ```powershell
 usbipd bind --busid <BUSID>
 .\tools\start-wsl-usb-auto-attach.ps1 -BusId <BUSID>
 ```
 
+```bash
+./tools/start-wsl-usb-auto-attach.sh <BUSID>
+```
+
 `<BUSID>`は`usbipd list`で確認します。スクリプトはデバイスの再列挙や抜き差しを
-監視してWSLへ再attachするため、PowerShellウィンドウは開いたままにしてください。
+監視してWSLへ再attachするため、起動したPowerShellまたはWSLターミナルは開いたままにしてください。
 Tiny 2040本体とCMSIS-DAPデバッグプローブを併用する場合は、それぞれのBUSIDに対して
-PowerShellウィンドウを1つずつ起動します。
+PowerShellまたはWSLターミナルを1つずつ起動します。
 
 ## ドキュメント
 

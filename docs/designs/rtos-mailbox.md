@@ -3,7 +3,7 @@
 ## 概要
 
 - 状態: 実装済み
-- 対応Issue: #43
+- 対応Issue: #43, #72
 - 目的: FreeRTOSタスク間で固定長メッセージを安全に受け渡す共通メールボックスを提供する。
 - 背景: Runtimeアーキテクチャで定義したコマンド、返信および状態通知のQueueを、静的確保の共通APIで扱えるようにする。
 
@@ -42,16 +42,17 @@ typedef struct {
     StaticQueue_t queue_buffer;
 } mailbox_t;
 
-bool mailbox_init(mailbox_t *mailbox, void *storage,
-                  size_t capacity, size_t item_size);
-bool mailbox_send(mailbox_t *mailbox, const void *message, uint32_t timeout_ms);
-bool mailbox_receive(mailbox_t *mailbox, void *message, uint32_t timeout_ms);
-size_t mailbox_message_count(const mailbox_t *mailbox);
+error_code_t mailbox_init(mailbox_t *mailbox, void *storage,
+                          size_t capacity, size_t item_size);
+error_code_t mailbox_send(mailbox_t *mailbox, const void *message, uint32_t timeout_ms);
+error_code_t mailbox_receive(mailbox_t *mailbox, void *message, uint32_t timeout_ms);
+error_code_t mailbox_message_count(const mailbox_t *mailbox, size_t *count);
 ```
 
-- `mailbox_send`と`mailbox_receive`は、指定したミリ秒の待機時間内に操作できた場合だけ`true`を返す。
-- `mailbox_message_count`は未初期化時に0を返す。
-- `mailbox_init`は無効な引数およびFreeRTOSが表現できない容量・要素サイズで`false`を返す。呼び出し側は`storage`に少なくとも`capacity * item_size`バイトの静的領域を渡す。
+- 全APIは成功時に`ERROR_CODE_OK`を返す。`mailbox_send`と`mailbox_receive`は、指定した待機時間内に操作できない場合に`ERROR_CODE_TIMEOUT`を返す。
+- `mailbox_message_count`は`count`へ格納済みメッセージ数を返す。
+- `mailbox_init`は無効な引数に`ERROR_CODE_INVALID_ARGUMENT`、FreeRTOSが表現できない容量・要素サイズに`ERROR_CODE_OUT_OF_RANGE`を返す。呼び出し側は`storage`に少なくとも`capacity * item_size`バイトの静的領域を渡す。
+- 初期化前の操作、またはFreeRTOS操作が実行できない場合は`ERROR_CODE_NOT_READY`を返す。
 - メールボックスと格納領域は、利用するすべてのタスクより長く存続させる。
 
 ## 処理フロー

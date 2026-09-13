@@ -23,19 +23,21 @@ static bool handlers_are_valid(const state_machine_state_handler_t *handlers, si
     return true;
 }
 
-bool state_machine_init(state_machine_t *machine,
-                        mailbox_t *mailbox,
-                        event_flags_t *event_flags,
-                        event_flags_bits_t state_changed_flags,
-                        const state_machine_state_handler_t *handlers,
-                        size_t handler_count,
-                        state_machine_state_t initial_state)
+error_code_t state_machine_init(state_machine_t *machine,
+                                mailbox_t *mailbox,
+                                event_flags_t *event_flags,
+                                event_flags_bits_t state_changed_flags,
+                                const state_machine_state_handler_t *handlers,
+                                size_t handler_count,
+                                state_machine_state_t initial_state)
 {
     if ((machine == NULL) || (mailbox == NULL) || (event_flags == NULL) || (handlers == NULL)
-        || (handler_count == 0U) || (state_changed_flags == 0U)
-        || ((state_changed_flags & ~EVENT_FLAGS_USER_BITS_MASK) != 0U)
-        || !handlers_are_valid(handlers, handler_count)) {
-        return false;
+        || (handler_count == 0U) || !handlers_are_valid(handlers, handler_count)) {
+        return ERROR_CODE_INVALID_ARGUMENT;
+    }
+    if ((state_changed_flags == 0U)
+        || ((state_changed_flags & ~EVENT_FLAGS_USER_BITS_MASK) != 0U)) {
+        return ERROR_CODE_OUT_OF_RANGE;
     }
 
     machine->mailbox = mailbox;
@@ -45,51 +47,58 @@ bool state_machine_init(state_machine_t *machine,
     machine->handler_count = handler_count;
     machine->current_state = initial_state;
 
-    return find_handler(machine, initial_state) != NULL;
+    return find_handler(machine, initial_state) != NULL ? ERROR_CODE_OK : ERROR_CODE_INVALID_ARGUMENT;
 }
 
-bool state_machine_process_next(state_machine_t *machine, uint32_t timeout_ms)
+error_code_t state_machine_process_next(state_machine_t *machine, uint32_t timeout_ms)
 {
     state_machine_event_t event;
     state_machine_state_t next_state;
     const state_machine_state_handler_t *handler;
+    error_code_t result;
 
-    if ((machine == NULL) || (machine->mailbox == NULL) || (machine->event_flags == NULL)
-        || (machine->handlers == NULL) || (machine->handler_count == 0U)) {
-        return false;
+    if (machine == NULL) {
+        return ERROR_CODE_INVALID_ARGUMENT;
+    }
+    if ((machine->mailbox == NULL) || (machine->event_flags == NULL) || (machine->handlers == NULL)
+        || (machine->handler_count == 0U)) {
+        return ERROR_CODE_NOT_READY;
     }
 
-    if (!mailbox_receive(machine->mailbox, &event, timeout_ms)) {
-        return false;
+    result = mailbox_receive(machine->mailbox, &event, timeout_ms);
+    if (result != ERROR_CODE_OK) {
+        return result;
     }
 
     handler = find_handler(machine, machine->current_state);
     if ((handler == NULL) || (handler->callback == NULL)) {
-        return false;
+        return ERROR_CODE_NOT_READY;
     }
 
     next_state = machine->current_state;
-    if (!handler->callback(handler->context, machine->current_state, &event, &next_state)) {
-        return false;
+    result = handler->callback(handler->context, machine->current_state, &event, &next_state);
+    if (result != ERROR_CODE_OK) {
+        return result;
     }
 
     if (next_state == machine->current_state) {
-        return true;
+        return ERROR_CODE_OK;
     }
 
     if (find_handler(machine, next_state) == NULL) {
-        return false;
+        return ERROR_CODE_OUT_OF_RANGE;
     }
 
     machine->current_state = next_state;
     return event_flags_set(machine->event_flags, machine->state_changed_flags);
 }
 
-state_machine_state_t state_machine_current_state(const state_machine_t *machine)
+error_code_t state_machine_current_state(const state_machine_t *machine, state_machine_state_t *state)
 {
-    if (machine == NULL) {
-        return 0U;
+    if ((machine == NULL) || (state == NULL)) {
+        return ERROR_CODE_INVALID_ARGUMENT;
     }
 
-    return machine->current_state;
+    *state = machine->current_state;
+    return ERROR_CODE_OK;
 }

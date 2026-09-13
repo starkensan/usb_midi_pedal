@@ -38,6 +38,33 @@ target_compile_options(rgb_led_test PRIVATE -Wall -Wextra -Werror)
 
 add_test(NAME rgb_led_test COMMAND rgb_led_test)
 
+add_executable(usb_midi_test
+    drivers/usb_midi_test.c
+    ${PROJECT_SOURCE_DIR}/src/drivers/usb_midi/usb_midi.c
+)
+target_include_directories(usb_midi_test PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/mocks
+    ${PROJECT_SOURCE_DIR}/src
+)
+target_link_libraries(usb_midi_test PRIVATE unity::framework)
+target_compile_options(usb_midi_test PRIVATE -Wall -Wextra -Werror)
+
+add_test(NAME usb_midi_test COMMAND usb_midi_test)
+
+add_executable(usb_cdc_test
+    drivers/usb_cdc_test.c
+    ${PROJECT_SOURCE_DIR}/src/drivers/usb_cdc/usb_cdc.c
+)
+target_include_directories(usb_cdc_test PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/mocks
+    ${PROJECT_SOURCE_DIR}/src
+)
+target_compile_definitions(usb_cdc_test PRIVATE LOG_CONFIG_OUTPUT_USB_CDC)
+target_link_libraries(usb_cdc_test PRIVATE unity::framework)
+target_compile_options(usb_cdc_test PRIVATE -Wall -Wextra -Werror)
+
+add_test(NAME usb_cdc_test COMMAND usb_cdc_test)
+
 add_executable(test_log_level
     test_log_level.c
     ${PROJECT_SOURCE_DIR}/src/lib/logging/log_level.c

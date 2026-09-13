@@ -2,7 +2,7 @@
 
 Pimoroni Tiny 2040を使用した、拡張可能なUSB/DIN MIDIフットペダルのファームウェアプロジェクトです。
 
-現在はビルド環境と最小FreeRTOSファームウェアまで実装済みです。
+現在は最小FreeRTOSファームウェアとUSB MIDI OUT（Program Change、Control Change）を実装済みです。
 
 ## 想定ハードウェア
 
@@ -93,7 +93,7 @@ PowerShellまたはWSLターミナルを1つずつ起動します。
 - [ハードウェア仕様](docs/specifications/hardware.md)：電源、入出力回路、使用部品
 - [ピン割り当て](docs/specifications/pin_assignment.md)：Tiny 2040のGPIO、I2C、UARTの割り当て
 - [I2C ADC選定記録](docs/designs/adc-selection.md)：ADC候補の比較とADS1015採用理由
-- 今後追加予定：RTOS、MIDI、プリセット、画面設計
+- 今後追加予定：DIN MIDI OUT、プリセット、画面設計
 
 ## 現在の状態
 
@@ -104,4 +104,4 @@ PowerShellまたはWSLターミナルを1つずつ起動します。
 - [x] Pimoroni Tiny 2040公式ボード定義の選択
 - [x] 最小FreeRTOS起動とRGB LED点滅タスク
 - [x] プロジェクト固有のピン定義
-- [ ] USB MIDI実装
+- [x] USB MIDI OUT実装（Program Change、Control Change）

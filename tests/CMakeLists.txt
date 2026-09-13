@@ -89,3 +89,21 @@ target_link_libraries(app_state_machine_test PRIVATE unity::framework)
 target_compile_options(app_state_machine_test PRIVATE -Wall -Wextra -Werror)
 
 add_test(NAME app_state_machine_test COMMAND app_state_machine_test)
+
+add_executable(rtos_wrapper_test
+    rtos_wrapper/rtos_wrapper_test.c
+    ${PROJECT_SOURCE_DIR}/src/lib/rtos_wrapper/event_flags.c
+    ${PROJECT_SOURCE_DIR}/src/lib/rtos_wrapper/mailbox.c
+    ${PROJECT_SOURCE_DIR}/src/lib/rtos_wrapper/mutex.c
+    ${PROJECT_SOURCE_DIR}/src/lib/rtos_wrapper/semaphore.c
+    ${PROJECT_SOURCE_DIR}/src/lib/rtos_wrapper/state_machine.c
+)
+target_include_directories(rtos_wrapper_test PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/mocks
+    ${PROJECT_SOURCE_DIR}/src
+    ${PROJECT_SOURCE_DIR}/src/inc
+)
+target_link_libraries(rtos_wrapper_test PRIVATE unity::framework)
+target_compile_options(rtos_wrapper_test PRIVATE -Wall -Wextra -Werror)
+
+add_test(NAME rtos_wrapper_test COMMAND rtos_wrapper_test)

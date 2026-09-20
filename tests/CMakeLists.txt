@@ -96,6 +96,7 @@ add_executable(rtos_wrapper_test
     ${PROJECT_SOURCE_DIR}/src/lib/rtos_wrapper/mailbox.c
     ${PROJECT_SOURCE_DIR}/src/lib/rtos_wrapper/mutex.c
     ${PROJECT_SOURCE_DIR}/src/lib/rtos_wrapper/semaphore.c
+    ${PROJECT_SOURCE_DIR}/src/lib/rtos_wrapper/task.c
 )
 target_include_directories(rtos_wrapper_test PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/mocks

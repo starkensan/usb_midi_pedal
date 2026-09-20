@@ -1,13 +1,13 @@
-#ifndef LIB_RTOS_WAPPER_STATE_MACHINE_H
-#define LIB_RTOS_WAPPER_STATE_MACHINE_H
+#ifndef LIB_STATE_MACHINE_STATE_MACHINE_H
+#define LIB_STATE_MACHINE_STATE_MACHINE_H
 
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
 #include "error_code.h"
-#include "event_flags.h"
-#include "mailbox.h"
+#include "lib/rtos_wrapper/event_flags.h"
+#include "lib/rtos_wrapper/mailbox.h"
 
 typedef uint32_t state_machine_state_t;
 

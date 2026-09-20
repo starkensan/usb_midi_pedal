@@ -3,17 +3,18 @@
 ## 概要
 
 - 状態: 実装済み
-- 対応Issue: #68, #72
-- 目的: mailboxのイベントを現在状態のコールバックへ配送し、状態遷移をEvent Flagで通知する。
+- 対応Issue: #68, #72, #74
+- 目的: `lib/rtos_wrapper`のmailboxのイベントを現在状態のコールバックへ配送し、状態遷移をEvent Flagで通知する。
+- 配置: `src/lib/state_machine/`。RTOS機能の抽象化ではなく、RTOS機能を利用する汎用モジュールとして配置する。
 
 ## 責務と依存関係
 
 ```mermaid
 flowchart LR
-    producer[送信タスク] --> mailbox[mailbox]
+    producer[送信タスク] --> mailbox[lib/rtos_wrapper/mailbox]
     mailbox --> machine[state_machine]
     machine --> callback[状態コールバック]
-    machine --> flags[Event Flag]
+    machine --> flags[lib/rtos_wrapper/Event Flag]
 ```
 
 ## 公開インターフェース

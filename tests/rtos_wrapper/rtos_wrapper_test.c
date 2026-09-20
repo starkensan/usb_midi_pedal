@@ -6,7 +6,6 @@
 #include "lib/rtos_wrapper/mailbox.h"
 #include "lib/rtos_wrapper/mutex.h"
 #include "lib/rtos_wrapper/semaphore.h"
-#include "lib/rtos_wrapper/state_machine.h"
 
 static BaseType_t queue_result;
 static BaseType_t semaphore_result;
@@ -75,7 +74,7 @@ BaseType_t xQueueReceive(QueueHandle_t queue, void *message, TickType_t timeout)
 {
     (void)queue;
     (void)timeout;
-    memset(message, 0, sizeof(state_machine_event_t));
+    memset(message, 0, sizeof(uint32_t));
     return queue_result;
 }
 
@@ -110,18 +109,6 @@ BaseType_t xSemaphoreGive(SemaphoreHandle_t semaphore)
 {
     (void)semaphore;
     return semaphore_result;
-}
-
-static error_code_t state_handler(void *context,
-                                  state_machine_state_t current_state,
-                                  const state_machine_event_t *event,
-                                  state_machine_state_t *next_state)
-{
-    (void)context;
-    (void)current_state;
-    (void)event;
-    (void)next_state;
-    return ERROR_CODE_IO;
 }
 
 void setUp(void)
@@ -180,29 +167,11 @@ void test_semaphore_and_mutex_report_timeout(void)
     TEST_ASSERT_EQUAL(ERROR_CODE_TIMEOUT, mutex_lock(&mutex, 0U));
 }
 
-void test_state_machine_propagates_callback_error(void)
-{
-    mailbox_t mailbox = {0};
-    event_flags_t flags = {0};
-    uint32_t storage = 0U;
-    const state_machine_state_handler_t handlers[] = {
-        {.state = 0U, .callback = state_handler, .context = NULL},
-    };
-    state_machine_t machine = {0};
-
-    TEST_ASSERT_EQUAL(ERROR_CODE_OK, mailbox_init(&mailbox, &storage, 1U, sizeof(storage)));
-    TEST_ASSERT_EQUAL(ERROR_CODE_OK, event_flags_init(&flags));
-    TEST_ASSERT_EQUAL(ERROR_CODE_OK,
-                      state_machine_init(&machine, &mailbox, &flags, UINT32_C(0x01), handlers, 1U, 0U));
-    TEST_ASSERT_EQUAL(ERROR_CODE_IO, state_machine_process_next(&machine, 0U));
-}
-
 int main(void)
 {
     UNITY_BEGIN();
     RUN_TEST(test_event_flags_reports_invalid_range_timeout_and_value);
     RUN_TEST(test_mailbox_reports_result_codes_and_count);
     RUN_TEST(test_semaphore_and_mutex_report_timeout);
-    RUN_TEST(test_state_machine_propagates_callback_error);
     return UNITY_END();
 }

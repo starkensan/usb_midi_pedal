@@ -10,6 +10,9 @@ typedef struct {
 typedef void *TaskHandle_t;
 typedef void (*TaskFunction_t)(void *parameter);
 
+#define taskSCHEDULER_NOT_STARTED ((BaseType_t)0)
+#define taskSCHEDULER_RUNNING ((BaseType_t)2)
+
 TaskHandle_t xTaskCreateStatic(TaskFunction_t entry,
                                const char *name,
                                configSTACK_DEPTH_TYPE stack_depth,
@@ -20,5 +23,6 @@ TaskHandle_t xTaskCreateStatic(TaskFunction_t entry,
 void vTaskStartScheduler(void);
 void vTaskDelete(TaskHandle_t task);
 TaskHandle_t xTaskGetCurrentTaskHandle(void);
+BaseType_t xTaskGetSchedulerState(void);
 
 #endif /* TEST_MOCK_TASK_H */

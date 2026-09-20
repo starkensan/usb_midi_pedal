@@ -16,6 +16,7 @@ static TaskHandle_t current_task;
 static TaskHandle_t task_create_result;
 static TaskHandle_t deleted_task;
 static bool scheduler_started;
+static BaseType_t scheduler_state;
 
 EventGroupHandle_t xEventGroupCreateStatic(StaticEventGroup_t *event_group_buffer)
 {
@@ -148,6 +149,11 @@ TaskHandle_t xTaskGetCurrentTaskHandle(void)
     return current_task;
 }
 
+BaseType_t xTaskGetSchedulerState(void)
+{
+    return scheduler_state;
+}
+
 void setUp(void)
 {
     queue_result = pdPASS;
@@ -158,6 +164,7 @@ void setUp(void)
     task_create_result = NULL;
     deleted_task = NULL;
     scheduler_started = false;
+    scheduler_state = taskSCHEDULER_NOT_STARTED;
 }
 
 void tearDown(void)
@@ -240,6 +247,11 @@ void test_task_wrapper_rejects_self_deletion_and_reports_scheduler_return(void)
 
     TEST_ASSERT_EQUAL(ERROR_CODE_OK, rtos_task_create(&task, test_task_entry, "test", stack, 4U, NULL, 1U));
     current_task = task.handle;
+    TEST_ASSERT_EQUAL(ERROR_CODE_OK, rtos_task_delete(&task));
+
+    TEST_ASSERT_EQUAL(ERROR_CODE_OK, rtos_task_create(&task, test_task_entry, "test", stack, 4U, NULL, 1U));
+    current_task = task.handle;
+    scheduler_state = taskSCHEDULER_RUNNING;
     TEST_ASSERT_EQUAL(ERROR_CODE_UNSUPPORTED, rtos_task_delete(&task));
     TEST_ASSERT_EQUAL(ERROR_CODE_NOT_READY, rtos_scheduler_start());
     TEST_ASSERT_TRUE(scheduler_started);

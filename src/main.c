@@ -1,6 +1,4 @@
 #include "FreeRTOS.h"
-#include "task.h"
-
 #include <stdbool.h>
 
 #include "app/tasks/usb_midi_task.h"
@@ -9,6 +7,7 @@
 #include "drivers/usb_cdc/usb_cdc.h"
 #include "drivers/usb_midi/usb_midi.h"
 #include "lib/logging/logging.h"
+#include "lib/rtos_wrapper/task.h"
 #include "pico/stdlib.h"
 
 enum {
@@ -16,7 +15,7 @@ enum {
     HEARTBEAT_PERIOD_MS = 500,
 };
 
-static StaticTask_t heartbeat_task_buffer;
+static rtos_task_t heartbeat_task_state;
 static StackType_t heartbeat_task_stack[HEARTBEAT_TASK_STACK_WORDS];
 
 
@@ -61,17 +60,17 @@ int main(void)
     logging_init();
     LOG_INFO("USB MIDI Pedal starting");
 
-    TaskHandle_t heartbeat = xTaskCreateStatic(
-        heartbeat_task,
-        "heartbeat",
-        HEARTBEAT_TASK_STACK_WORDS,
-        NULL,
-        tskIDLE_PRIORITY + 1,
-        heartbeat_task_stack,
-        &heartbeat_task_buffer);
-
-    configASSERT(heartbeat != NULL);
-    if (heartbeat == NULL) {
+    if (rtos_task_init(&heartbeat_task_state) != ERROR_CODE_OK) {
+        return 1;
+    }
+    if (rtos_task_create(&heartbeat_task_state,
+                         heartbeat_task,
+                         "heartbeat",
+                         heartbeat_task_stack,
+                         HEARTBEAT_TASK_STACK_WORDS,
+                         NULL,
+                         tskIDLE_PRIORITY + 1)
+        != ERROR_CODE_OK) {
         return 1;
     }
 
@@ -81,7 +80,7 @@ int main(void)
         return 1;
     }
 
-    vTaskStartScheduler();
+    (void)rtos_scheduler_start();
 
     for (;;) {
         tight_loop_contents();

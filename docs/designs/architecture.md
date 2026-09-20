@@ -124,7 +124,7 @@ flowchart LR
 | スイッチのデバウンス計算 | `lib/input/` |
 | 入力を周期的に走査するFreeRTOSタスク | `app/tasks/` |
 | FreeRTOS Queueを用いるメールボックス | `lib/rtos_wrapper/` |
-| FreeRTOS Event Group、Semaphore、Mutexを用いる同期機能 | `lib/rtos_wrapper/` |
+| FreeRTOSの静的タスク生成、Event Group、Semaphore、Mutexを用いるRTOS機能 | `lib/rtos_wrapper/` |
 | メールボックスとEvent Flagを用いる状態機械 | `lib/state_machine/` |
 | タスク間排他を伴う診断ログの整形 | `lib/logging/` |
 | USB CDCまたはUARTへのログ実出力 | `drivers/log_output/` |

@@ -6,6 +6,7 @@
 #include <stdint.h>
 
 #include "FreeRTOS.h"
+#include "error_code.h"
 #include "queue.h"
 
 typedef struct {
@@ -13,9 +14,9 @@ typedef struct {
     StaticQueue_t queue_buffer;
 } mailbox_t;
 
-bool mailbox_init(mailbox_t *mailbox, void *storage, size_t capacity, size_t item_size);
-bool mailbox_send(mailbox_t *mailbox, const void *message, uint32_t timeout_ms);
-bool mailbox_receive(mailbox_t *mailbox, void *message, uint32_t timeout_ms);
-size_t mailbox_message_count(const mailbox_t *mailbox);
+error_code_t mailbox_init(mailbox_t *mailbox, void *storage, size_t capacity, size_t item_size);
+error_code_t mailbox_send(mailbox_t *mailbox, const void *message, uint32_t timeout_ms);
+error_code_t mailbox_receive(mailbox_t *mailbox, void *message, uint32_t timeout_ms);
+error_code_t mailbox_message_count(const mailbox_t *mailbox, size_t *count);
 
 #endif

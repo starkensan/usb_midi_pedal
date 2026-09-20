@@ -6,6 +6,7 @@
 #include <stdint.h>
 
 #include "FreeRTOS.h"
+#include "error_code.h"
 #include "semphr.h"
 
 typedef struct {
@@ -13,8 +14,8 @@ typedef struct {
     StaticSemaphore_t semaphore_buffer;
 } semaphore_t;
 
-bool semaphore_init(semaphore_t *semaphore, size_t maximum_count, size_t initial_count);
-bool semaphore_give(semaphore_t *semaphore);
-bool semaphore_take(semaphore_t *semaphore, uint32_t timeout_ms);
+error_code_t semaphore_init(semaphore_t *semaphore, size_t maximum_count, size_t initial_count);
+error_code_t semaphore_give(semaphore_t *semaphore);
+error_code_t semaphore_take(semaphore_t *semaphore, uint32_t timeout_ms);
 
 #endif

@@ -6,6 +6,7 @@
 #include <stdint.h>
 
 #include "FreeRTOS.h"
+#include "error_code.h"
 #include "semphr.h"
 
 typedef struct {
@@ -13,8 +14,8 @@ typedef struct {
     StaticSemaphore_t mutex_buffer;
 } mutex_t;
 
-bool freertos_mutex_init(mutex_t *mutex);
-bool mutex_lock(mutex_t *mutex, uint32_t timeout_ms);
-bool mutex_unlock(mutex_t *mutex);
+error_code_t freertos_mutex_init(mutex_t *mutex);
+error_code_t mutex_lock(mutex_t *mutex, uint32_t timeout_ms);
+error_code_t mutex_unlock(mutex_t *mutex);
 
 #endif

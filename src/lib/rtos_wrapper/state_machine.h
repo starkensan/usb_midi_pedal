@@ -5,6 +5,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "error_code.h"
 #include "event_flags.h"
 #include "mailbox.h"
 
@@ -15,10 +16,10 @@ typedef struct {
     uintptr_t parameter;
 } state_machine_event_t;
 
-typedef bool (*state_machine_callback_t)(void *context,
-                                         state_machine_state_t current_state,
-                                         const state_machine_event_t *event,
-                                         state_machine_state_t *next_state);
+typedef error_code_t (*state_machine_callback_t)(void *context,
+                                                  state_machine_state_t current_state,
+                                                  const state_machine_event_t *event,
+                                                  state_machine_state_t *next_state);
 
 typedef struct {
     state_machine_state_t state;
@@ -35,14 +36,15 @@ typedef struct {
     state_machine_state_t current_state;
 } state_machine_t;
 
-bool state_machine_init(state_machine_t *machine,
-                        mailbox_t *mailbox,
-                        event_flags_t *event_flags,
-                        event_flags_bits_t state_changed_flags,
-                        const state_machine_state_handler_t *handlers,
-                        size_t handler_count,
-                        state_machine_state_t initial_state);
-bool state_machine_process_next(state_machine_t *machine, uint32_t timeout_ms);
-state_machine_state_t state_machine_current_state(const state_machine_t *machine);
+error_code_t state_machine_init(state_machine_t *machine,
+                                mailbox_t *mailbox,
+                                event_flags_t *event_flags,
+                                event_flags_bits_t state_changed_flags,
+                                const state_machine_state_handler_t *handlers,
+                                size_t handler_count,
+                                state_machine_state_t initial_state);
+error_code_t state_machine_process_next(state_machine_t *machine, uint32_t timeout_ms);
+error_code_t state_machine_current_state(const state_machine_t *machine,
+                                         state_machine_state_t *state);
 
 #endif

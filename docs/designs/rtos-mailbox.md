@@ -66,12 +66,12 @@ sequenceDiagram
 
     Producer->>Mailbox: mailbox_send(message, timeout_ms)
     Mailbox->>Queue: xQueueSendToBack
-    Queue-->>Mailbox: 成功 / タイムアウト
-    Mailbox-->>Producer: true / false
+    Queue-->>Mailbox: ERROR_CODE_OK / ERROR_CODE_TIMEOUT
+    Mailbox-->>Producer: error_code_t
     Consumer->>Mailbox: mailbox_receive(message, timeout_ms)
     Mailbox->>Queue: xQueueReceive
-    Queue-->>Mailbox: メッセージ / タイムアウト
-    Mailbox-->>Consumer: true / false
+    Queue-->>Mailbox: ERROR_CODE_OK / ERROR_CODE_TIMEOUT
+    Mailbox-->>Consumer: error_code_t
 ```
 
 ## RTOS・ハードウェア上の考慮

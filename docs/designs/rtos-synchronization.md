@@ -76,10 +76,10 @@ sequenceDiagram
 
     Producer->>API: event_flags_set / semaphore_give
     API->>API: FreeRTOS APIを呼び出し
-    API-->>Producer: true / false
+    API-->>Producer: error_code_t
     Consumer->>API: event_flags_wait / semaphore_take / mutex_lock
     API->>API: 指定時間までFreeRTOS APIで待機
-    API-->>Consumer: true / false
+    API-->>Consumer: error_code_t
 ```
 
 ## RTOS・ハードウェア上の考慮
@@ -87,7 +87,7 @@ sequenceDiagram
 - 実行コンテキスト: タスクのみ。ISRからは呼び出さない。
 - FreeRTOSオブジェクトは`event_flags_t`、`semaphore_t`、`mutex_t`の内部バッファを使って静的に確保し、Heapを使用しない。
 - タイムアウトはミリ秒で指定する。有限待機として表現できる最大tick以上は`portMAX_DELAY - 1` tickへ飽和させる。
-- 各オブジェクトは静的記憶域期間で確保し、それを利用するすべてのタスクより長く存続させる。初期化と利用を並行させず、`*_init`が`true`を返した後にだけ操作関数を使用する。
+- 各オブジェクトは静的記憶域期間で確保し、それを利用するすべてのタスクより長く存続させる。初期化と利用を並行させず、`*_init`が`ERROR_CODE_OK`を返した後にだけ操作関数を使用する。
 - mutexを保持したままブロッキングI/Oや長時間処理を行わない。
 
 ## 検証方法

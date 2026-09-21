@@ -92,12 +92,12 @@ add_test(NAME app_state_machine_test COMMAND app_state_machine_test)
 
 add_executable(rtos_wrapper_test
     rtos_wrapper/rtos_wrapper_test.c
-    ${PROJECT_SOURCE_DIR}/src/app/rtos/delay.c
+    ${PROJECT_SOURCE_DIR}/src/lib/rtos_wrapper/delay.c
     ${PROJECT_SOURCE_DIR}/src/lib/rtos_wrapper/event_flags.c
     ${PROJECT_SOURCE_DIR}/src/lib/rtos_wrapper/mailbox.c
     ${PROJECT_SOURCE_DIR}/src/lib/rtos_wrapper/mutex.c
     ${PROJECT_SOURCE_DIR}/src/lib/rtos_wrapper/semaphore.c
-    ${PROJECT_SOURCE_DIR}/src/app/rtos/timer.c
+    ${PROJECT_SOURCE_DIR}/src/lib/rtos_wrapper/timer.c
 )
 target_include_directories(rtos_wrapper_test PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/mocks

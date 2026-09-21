@@ -14,7 +14,7 @@ static error_code_t delay_ms_to_ticks(uint32_t delay_ms, TickType_t *delay_ticks
         return ERROR_CODE_OUT_OF_RANGE;
     }
 
-    *delay_ticks = app_rtos_timeout_ms_to_ticks(delay_ms);
+    *delay_ticks = freertos_timeout_ms_to_ticks(delay_ms);
     return *delay_ticks == 0U ? ERROR_CODE_OUT_OF_RANGE : ERROR_CODE_OK;
 }
 

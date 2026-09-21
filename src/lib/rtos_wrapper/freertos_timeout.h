@@ -1,5 +1,5 @@
-#ifndef LIB_CONCURRENCY_FREERTOS_TIMEOUT_H
-#define LIB_CONCURRENCY_FREERTOS_TIMEOUT_H
+#ifndef LIB_RTOS_WRAPPER_FREERTOS_TIMEOUT_H
+#define LIB_RTOS_WRAPPER_FREERTOS_TIMEOUT_H
 
 #include <stdint.h>
 
@@ -16,4 +16,4 @@ static inline TickType_t freertos_timeout_ms_to_ticks(uint32_t timeout_ms)
     return (TickType_t)ticks;
 }
 
-#endif
+#endif /* LIB_RTOS_WRAPPER_FREERTOS_TIMEOUT_H */

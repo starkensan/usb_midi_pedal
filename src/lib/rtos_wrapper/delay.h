@@ -1,5 +1,5 @@
-#ifndef APP_RTOS_DELAY_H
-#define APP_RTOS_DELAY_H
+#ifndef LIB_RTOS_WRAPPER_DELAY_H
+#define LIB_RTOS_WRAPPER_DELAY_H
 
 #include <stdint.h>
 
@@ -14,4 +14,4 @@ error_code_t rtos_delay_ms(uint32_t delay_ms);
 error_code_t rtos_periodic_delay_init(rtos_periodic_delay_t *delay);
 error_code_t rtos_periodic_delay_wait(rtos_periodic_delay_t *delay, uint32_t period_ms);
 
-#endif /* APP_RTOS_DELAY_H */
+#endif /* LIB_RTOS_WRAPPER_DELAY_H */

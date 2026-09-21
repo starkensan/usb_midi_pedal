@@ -23,7 +23,7 @@ error_code_t rtos_timer_init(rtos_timer_t *timer,
                              TimerCallbackFunction_t callback,
                              void *context)
 {
-    const TickType_t period_ticks = app_rtos_timeout_ms_to_ticks(period_ms);
+    const TickType_t period_ticks = freertos_timeout_ms_to_ticks(period_ms);
 
     if ((timer == NULL) || (name == NULL) || (callback == NULL)) {
         return ERROR_CODE_INVALID_ARGUMENT;

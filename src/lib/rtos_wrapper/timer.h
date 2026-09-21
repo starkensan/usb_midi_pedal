@@ -1,5 +1,5 @@
-#ifndef APP_RTOS_TIMER_H
-#define APP_RTOS_TIMER_H
+#ifndef LIB_RTOS_WRAPPER_TIMER_H
+#define LIB_RTOS_WRAPPER_TIMER_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -23,4 +23,4 @@ error_code_t rtos_timer_start(rtos_timer_t *timer);
 error_code_t rtos_timer_stop(rtos_timer_t *timer);
 error_code_t rtos_timer_reset(rtos_timer_t *timer);
 
-#endif /* APP_RTOS_TIMER_H */
+#endif /* LIB_RTOS_WRAPPER_TIMER_H */

@@ -240,7 +240,7 @@ void test_task_wrapper_creates_deletes_and_validates_lifecycle(void)
     TEST_ASSERT_EQUAL(ERROR_CODE_NOT_READY, rtos_task_delete(&task));
 }
 
-void test_task_wrapper_rejects_self_deletion_and_reports_scheduler_return(void)
+void test_task_wrapper_rejects_self_deletion_after_scheduler_start(void)
 {
     rtos_task_t task = {0};
     StackType_t stack[4] = {0};
@@ -251,7 +251,7 @@ void test_task_wrapper_rejects_self_deletion_and_reports_scheduler_return(void)
 
     TEST_ASSERT_EQUAL(ERROR_CODE_OK, rtos_task_create(&task, test_task_entry, "test", stack, 4U, NULL, 1U));
     current_task = task.handle;
-    scheduler_state = taskSCHEDULER_RUNNING;
+    scheduler_state = taskSCHEDULER_SUSPENDED;
     TEST_ASSERT_EQUAL(ERROR_CODE_UNSUPPORTED, rtos_task_delete(&task));
     TEST_ASSERT_EQUAL(ERROR_CODE_NOT_READY, rtos_scheduler_start());
     TEST_ASSERT_TRUE(scheduler_started);
@@ -264,6 +264,6 @@ int main(void)
     RUN_TEST(test_mailbox_reports_result_codes_and_count);
     RUN_TEST(test_semaphore_and_mutex_report_timeout);
     RUN_TEST(test_task_wrapper_creates_deletes_and_validates_lifecycle);
-    RUN_TEST(test_task_wrapper_rejects_self_deletion_and_reports_scheduler_return);
+    RUN_TEST(test_task_wrapper_rejects_self_deletion_after_scheduler_start);
     return UNITY_END();
 }

@@ -55,7 +55,7 @@ error_code_t rtos_task_delete(rtos_task_t *task)
     if (task->handle == NULL) {
         return ERROR_CODE_NOT_READY;
     }
-    if ((xTaskGetSchedulerState() == taskSCHEDULER_RUNNING)
+    if ((xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED)
         && (task->handle == xTaskGetCurrentTaskHandle())) {
         return ERROR_CODE_UNSUPPORTED;
     }

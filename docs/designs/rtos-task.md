@@ -58,7 +58,7 @@ error_code_t rtos_task_delete(rtos_task_t *task);
 - `rtos_task_init`は制御領域を未生成状態へ初期化する。生成済みタスクに対して呼び出してはならない。
 - `rtos_task_create`は`xTaskCreateStatic`を呼び出す。同一の`rtos_task_t`を重複して生成することはできない。
 - `rtos_scheduler_start`は`vTaskStartScheduler`を呼び出す。正常に開始した場合は復帰しない。復帰した場合は`ERROR_CODE_NOT_READY`を返す。
-- `rtos_task_delete`は、スケジューラ実行中は他タスクだけを削除できる。スケジューラ開始前の削除は許可し、実行中に自身を削除しようとした場合は`ERROR_CODE_UNSUPPORTED`を返す。
+- `rtos_task_delete`は、スケジューラ開始後は他タスクだけを削除できる。スケジューラ開始前の削除は許可し、実行中またはスケジューリング一時停止中に自身を削除しようとした場合は`ERROR_CODE_UNSUPPORTED`を返す。
 
 ## 処理フロー
 

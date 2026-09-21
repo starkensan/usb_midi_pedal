@@ -11,6 +11,7 @@ typedef void *TaskHandle_t;
 typedef void (*TaskFunction_t)(void *parameter);
 
 #define taskSCHEDULER_NOT_STARTED ((BaseType_t)0)
+#define taskSCHEDULER_SUSPENDED ((BaseType_t)1)
 #define taskSCHEDULER_RUNNING ((BaseType_t)2)
 
 TaskHandle_t xTaskCreateStatic(TaskFunction_t entry,

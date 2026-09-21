@@ -4,6 +4,8 @@ add_executable(usb_midi_pedal
     lib/rtos_wrapper/mailbox.c
     lib/rtos_wrapper/mutex.c
     lib/rtos_wrapper/semaphore.c
+    lib/rtos_wrapper/delay.c
+    lib/rtos_wrapper/timer.c
     lib/state_machine/state_machine.c
     lib/logging/log_level.c
     lib/logging/logging.c

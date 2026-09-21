@@ -3,11 +3,11 @@
 #include <string.h>
 
 #include "lib/rtos_wrapper/event_flags.h"
-#include "lib/rtos_wrapper/delay.h"
+#include "app/rtos/delay.h"
 #include "lib/rtos_wrapper/mailbox.h"
 #include "lib/rtos_wrapper/mutex.h"
 #include "lib/rtos_wrapper/semaphore.h"
-#include "lib/rtos_wrapper/timer.h"
+#include "app/rtos/timer.h"
 
 static BaseType_t queue_result;
 static BaseType_t semaphore_result;

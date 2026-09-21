@@ -25,8 +25,8 @@
 
 ```mermaid
 flowchart LR
-    app[app task] --> timer[lib/rtos_wrapper/timer]
-    app --> delay[lib/rtos_wrapper/delay]
+    app[app task] --> timer[app/rtos/timer]
+    app --> delay[app/rtos/delay]
     timer --> freertos_timer[FreeRTOS timer API]
     delay --> freertos_task[FreeRTOS task API]
 ```

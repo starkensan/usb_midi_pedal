@@ -25,5 +25,8 @@ void vTaskStartScheduler(void);
 void vTaskDelete(TaskHandle_t task);
 TaskHandle_t xTaskGetCurrentTaskHandle(void);
 BaseType_t xTaskGetSchedulerState(void);
+void vTaskDelay(TickType_t ticks);
+TickType_t xTaskGetTickCount(void);
+void vTaskDelayUntil(TickType_t *previous_wake_time, TickType_t increment);
 
 #endif /* TEST_MOCK_TASK_H */

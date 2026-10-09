@@ -27,7 +27,7 @@
 - ハードウェア非依存の処理とデータ型は`src/lib/`へ配置します。
 - Pico SDKやデバイスへ依存する処理は`src/drivers/`へ配置します。
 - 基板固有のピン割り当てと初期化は`src/board/`へ配置します。
-- `lib`から`app`、`drivers`、FreeRTOS、Pico SDKへ依存させないでください。
+- `lib`から`app`およびPico SDKへ依存させないでください。`lib`から`drivers`への依存は許可します。FreeRTOSへの依存は、FreeRTOS機能を抽象化する`lib/rtos_wrapper`内に限定します。
 - Pico SDK APIは原則として`drivers`と`board`の内部に閉じ込めてください。
 - Pico SDKとFreeRTOS Kernelは`external/`のGit submoduleとして管理し、直接編集しないでください。
 

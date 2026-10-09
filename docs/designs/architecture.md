@@ -61,9 +61,10 @@ usb_midi_pedal/
 - プリセットのデータ構造とエンコード
 - OLEDへ描画するフレームバッファ処理
 
-`lib`はPico SDKおよびFreeRTOSに依存させません。FreeRTOSを使うメールボックス、Event Flag、
-Semaphore、Mutexの抽象化は`lib/rtos_wrapper`に配置します。タスク生成・削除とスケジューラ
-制御はFreeRTOS型を公開するため、`app/tasks`に配置します。`lib/state_machine`は
+`lib`はPico SDKに依存させません。`lib/rtos_wrapper`はFreeRTOS依存を許可する境界として、
+メールボックス、Event Flag、Semaphore、Mutexのラッパーを配置します。公開ヘッダーはFreeRTOSの
+ハンドル型と静的制御ブロック型を使うため、FreeRTOS型を隠蔽する層ではありません。
+製品固有タスクの生成・削除とスケジューラ制御は`app/tasks`に配置します。`lib/state_machine`は
 `rtos_wrapper`のメールボックスとEvent Flagを利用します。`lib`から`drivers`への依存を許可し、`lib/logging`は
 ログ出力ドライバを利用します。
 
@@ -94,6 +95,7 @@ flowchart LR
     app[app] --> lib[lib]
     app --> drivers[drivers]
     state_machine[lib/state_machine] --> rtos_wrapper[lib/rtos_wrapper]
+    rtos_wrapper --> freertos
     app --> freertos
     lib --> drivers
     drivers --> lib
@@ -112,7 +114,7 @@ flowchart LR
 - `app`は`lib`と`drivers`を利用できます。
 - `drivers`は共通データ型を利用するために`lib`へ依存できます。
 - `lib`は`app`へ依存してはいけません。`lib`から`drivers`への依存は許可します。
-- `lib/rtos_wrapper`はFreeRTOSに依存する同期オブジェクトおよびメールボックスの抽象化を提供しますが、FreeRTOSの型を公開しません。
+- `lib/rtos_wrapper`はFreeRTOSに依存し、公開ヘッダーでFreeRTOSのハンドル型と静的制御ブロック型を使う同期オブジェクト、メールボックス、タイマーおよび待機機能を提供します。
 - `app/tasks`はFreeRTOSタスクAPIを使い、タスクの生成・削除とスケジューラを管理します。
 - `lib/state_machine`は`lib/rtos_wrapper`を利用して、メールボックスとEvent Flagによる状態機械を提供します。
 - Pico SDK APIは`drivers`と`board`内に閉じ込めます。
@@ -128,6 +130,7 @@ flowchart LR
 | FreeRTOS Queueを用いるメールボックス | `lib/rtos_wrapper/` |
 | FreeRTOSの静的タスク生成、削除、スケジューラ制御 | `app/tasks/` |
 | FreeRTOS Event Group、Semaphore、Mutexを用いる同期機能 | `lib/rtos_wrapper/` |
+| FreeRTOSソフトウェアタイマー、タスク待機 | `lib/rtos_wrapper/` |
 | メールボックスとEvent Flagを用いる状態機械 | `lib/state_machine/` |
 | タスク間排他を伴う診断ログの整形 | `lib/logging/` |
 | USB CDCまたはUARTへのログ実出力 | `drivers/log_output/` |

@@ -13,6 +13,7 @@
 | 設計 | [designs/README.md](designs/README.md) | アーキテクチャ、設計判断、機能・モジュールごとの設計 |
 | 作成済み | [designs/adc-selection.md](designs/adc-selection.md) | I2C ADC候補の比較とADS1015採用判断 |
 | 作成済み | [designs/runtime-architecture.md](designs/runtime-architecture.md) | 状態機械、タスク、モジュール境界、保存、将来のデュアルコア移行方針 |
+| 実装済み・実機検証待ち | [designs/din-midi-driver.md](designs/din-midi-driver.md) | UART1を使ったDIN MIDI OUTバイト送信 |
 | 作成済み | [designs/rtos-mailbox.md](designs/rtos-mailbox.md) | FreeRTOSタスク間で固定長メッセージを受け渡す静的メールボックス |
 | 作成済み | [designs/rtos-synchronization.md](designs/rtos-synchronization.md) | Event Flag、Semaphore、Mutexによる静的なRTOS同期機能 |
 | 作成済み | [designs/rtos-timer-delay.md](designs/rtos-timer-delay.md) | 静的ソフトウェアタイマーとタスク待機 |

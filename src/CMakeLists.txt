@@ -10,6 +10,7 @@ add_executable(usb_midi_pedal
     lib/logging/log_level.c
     lib/logging/logging.c
     drivers/log_output/log_output.c
+    drivers/flash_storage/flash_storage.c
     drivers/rgb_led/rgb_led.c
     drivers/debug_uart/debug_uart.c
     drivers/usb_cdc/usb_cdc.c
@@ -23,6 +24,7 @@ target_include_directories(usb_midi_pedal PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}
     ${CMAKE_CURRENT_LIST_DIR}/drivers/debug_uart
     ${CMAKE_CURRENT_LIST_DIR}/drivers/log_output
+    ${CMAKE_CURRENT_LIST_DIR}/drivers/flash_storage
     ${CMAKE_CURRENT_LIST_DIR}/drivers/usb_cdc
     ${CMAKE_CURRENT_LIST_DIR}/drivers/usb_midi
     ${CMAKE_CURRENT_LIST_DIR}/app/tasks
@@ -36,6 +38,8 @@ target_link_libraries(usb_midi_pedal PRIVATE
     tinyusb_device
     hardware_i2c
     hardware_uart
+    hardware_flash
+    pico_flash
 )
 
 target_include_directories(usb_midi_pedal PRIVATE

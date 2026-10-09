@@ -33,7 +33,20 @@ ctest --test-dir build/host-tests --output-on-failure
 
 ホストテストにはネイティブCコンパイラと、CMockのモック生成用にRuby 3.0以降が
 必要です。UnityとCMockを利用できるように、リポジトリを取得した後はすべての
-サブモジュールを初期化してください。
+サブモジュールを再帰的に初期化してください。CMockはUnityなどを入れ子のサブモジュールとして
+使用するため、`--recursive`を付けないとモック生成時に依存ファイルが見つからず失敗します。
+
+```sh
+git submodule update --init --recursive
+```
+
+初期化後、ホストテストは次のコマンドで構成、ビルド、実行します。
+
+```sh
+cmake --preset host-tests
+cmake --build --preset host-tests
+ctest --test-dir build/host-tests --output-on-failure
+```
 
 変更後は、少なくともDebugビルドが成功することを確認してください。ビルドできない環境では、実行できなかった理由を明記してください。
 

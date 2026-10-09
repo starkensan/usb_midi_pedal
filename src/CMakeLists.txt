@@ -4,7 +4,6 @@ add_executable(usb_midi_pedal
     lib/rtos_wrapper/mailbox.c
     lib/rtos_wrapper/mutex.c
     lib/rtos_wrapper/semaphore.c
-    lib/rtos_wrapper/task.c
     lib/state_machine/state_machine.c
     lib/logging/log_level.c
     lib/logging/logging.c
@@ -16,6 +15,7 @@ add_executable(usb_midi_pedal
     drivers/usb_midi/usb_midi_descriptors.c
     app/app_controller/app_state_machine.c
     app/tasks/usb_midi_task.c
+    app/tasks/rtos_task.c
 )
 
 target_include_directories(usb_midi_pedal PRIVATE

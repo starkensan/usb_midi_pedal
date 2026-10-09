@@ -1,4 +1,4 @@
-#include "task.h"
+#include "app/tasks/rtos_task.h"
 
 #include <string.h>
 
@@ -27,7 +27,7 @@ error_code_t rtos_task_create(rtos_task_t *task,
         || (priority >= (UBaseType_t)configMAX_PRIORITIES)) {
         return ERROR_CODE_OUT_OF_RANGE;
     }
-    if (task->handle != NULL) {
+    if ((task->handle != NULL) || task->cleanup_pending) {
         return ERROR_CODE_NOT_READY;
     }
 
@@ -55,12 +55,14 @@ error_code_t rtos_task_delete(rtos_task_t *task)
     if (task->handle == NULL) {
         return ERROR_CODE_NOT_READY;
     }
-    if ((xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED)
-        && (task->handle == xTaskGetCurrentTaskHandle())) {
+    const BaseType_t scheduler_state = xTaskGetSchedulerState();
+    const bool deleting_current_task = task->handle == xTaskGetCurrentTaskHandle();
+    if ((scheduler_state != taskSCHEDULER_NOT_STARTED) && deleting_current_task) {
         return ERROR_CODE_UNSUPPORTED;
     }
 
     vTaskDelete(task->handle);
+    task->cleanup_pending = (scheduler_state == taskSCHEDULER_NOT_STARTED) && deleting_current_task;
     task->handle = NULL;
     return ERROR_CODE_OK;
 }

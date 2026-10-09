@@ -7,7 +7,7 @@
 #include "drivers/usb_cdc/usb_cdc.h"
 #include "drivers/usb_midi/usb_midi.h"
 #include "lib/logging/logging.h"
-#include "lib/rtos_wrapper/task.h"
+#include "app/tasks/rtos_task.h"
 #include "pico/stdlib.h"
 
 enum {

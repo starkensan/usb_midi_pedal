@@ -2,7 +2,7 @@
 
 #include "FreeRTOS.h"
 #include "drivers/usb_midi/usb_midi.h"
-#include "lib/rtos_wrapper/task.h"
+#include "app/tasks/rtos_task.h"
 
 enum {
     USB_MIDI_TASK_STACK_WORDS = 256,

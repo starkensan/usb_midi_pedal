@@ -25,22 +25,25 @@
 
 ```mermaid
 flowchart LR
-    app[app/tasks] --> wrapper[lib/rtos_wrapper/task]
+    app[app] --> wrapper[app/tasks/rtos_task]
     wrapper --> freertos[FreeRTOS task API]
 ```
 
-- `lib/rtos_wrapper/task`は、呼び出し側が所有するスタック領域と内部の静的TCBを用いてタスクを作成する。
+- `app/tasks/rtos_task`は、呼び出し側が所有するスタック領域と内部の静的TCBを用いてタスクを作成する。FreeRTOS型を使うため`lib`には配置しない。
 - `app`はタスク関数、名前、優先度、引数およびスタック領域を指定する。
 - モジュールはFreeRTOSの`task.h`と共通の`error_code.h`に依存する。
 
 ## 公開インターフェース
 
 ```c
+#include <stdbool.h>
+
 typedef void (*rtos_task_entry_t)(void *parameter);
 
 typedef struct {
     TaskHandle_t handle;
     StaticTask_t task_buffer;
+    bool cleanup_pending;
 } rtos_task_t;
 
 error_code_t rtos_task_init(rtos_task_t *task);
@@ -55,8 +58,8 @@ error_code_t rtos_scheduler_start(void);
 error_code_t rtos_task_delete(rtos_task_t *task);
 ```
 
-- `rtos_task_init`は制御領域を未生成状態へ初期化する。生成済みタスクに対して呼び出してはならない。
-- `rtos_task_create`は`xTaskCreateStatic`を呼び出す。同一の`rtos_task_t`を重複して生成することはできない。
+- `rtos_task_init`は新しい制御領域に対して一度だけ呼び出す。タスク削除後も含め、同じ制御領域を再初期化してはならない。
+- `rtos_task_create`は`xTaskCreateStatic`を呼び出す。同一の`rtos_task_t`を重複して生成することはできない。スケジューラ開始前に選択中タスクを削除した場合、FreeRTOSのIdleタスクによるTCB後処理まで制御領域を再利用できないため、同じ`rtos_task_t`での再生成を拒否する。
 - `rtos_scheduler_start`は`vTaskStartScheduler`を呼び出す。正常に開始した場合は復帰しない。復帰した場合は`ERROR_CODE_NOT_READY`を返す。
 - `rtos_task_delete`は、スケジューラ開始後は他タスクだけを削除できる。スケジューラ開始前の削除は許可し、実行中またはスケジューリング一時停止中に自身を削除しようとした場合は`ERROR_CODE_UNSUPPORTED`を返す。
 
@@ -85,5 +88,5 @@ sequenceDiagram
 
 ## 検証方法
 
-- ホスト単体テストで、引数検証、生成、重複生成、削除、自己削除拒否およびスケジューラ開始失敗時の結果を確認する。
+- ホスト単体テストで、引数検証、生成、重複生成、削除、開始前の削除後に同じTCB領域を再利用できないこと、自己削除拒否およびスケジューラ開始失敗時の結果を確認する。
 - Debugファームウェアをビルドし、FreeRTOS静的タスクAPIとのリンクを確認する。

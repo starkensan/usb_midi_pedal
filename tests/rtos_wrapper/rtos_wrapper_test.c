@@ -6,7 +6,7 @@
 #include "lib/rtos_wrapper/mailbox.h"
 #include "lib/rtos_wrapper/mutex.h"
 #include "lib/rtos_wrapper/semaphore.h"
-#include "lib/rtos_wrapper/task.h"
+#include "app/tasks/rtos_task.h"
 
 static BaseType_t queue_result;
 static BaseType_t semaphore_result;
@@ -243,16 +243,27 @@ void test_task_wrapper_creates_deletes_and_validates_lifecycle(void)
 void test_task_wrapper_rejects_self_deletion_after_scheduler_start(void)
 {
     rtos_task_t task = {0};
+    rtos_task_t suspended_task = {0};
     StackType_t stack[4] = {0};
+    StackType_t suspended_stack[4] = {0};
 
     TEST_ASSERT_EQUAL(ERROR_CODE_OK, rtos_task_create(&task, test_task_entry, "test", stack, 4U, NULL, 1U));
     current_task = task.handle;
     TEST_ASSERT_EQUAL(ERROR_CODE_OK, rtos_task_delete(&task));
+    TEST_ASSERT_EQUAL(ERROR_CODE_NOT_READY,
+                      rtos_task_create(&task, test_task_entry, "test", stack, 4U, NULL, 1U));
 
-    TEST_ASSERT_EQUAL(ERROR_CODE_OK, rtos_task_create(&task, test_task_entry, "test", stack, 4U, NULL, 1U));
-    current_task = task.handle;
+    TEST_ASSERT_EQUAL(ERROR_CODE_OK,
+                      rtos_task_create(&suspended_task,
+                                       test_task_entry,
+                                       "test",
+                                       suspended_stack,
+                                       4U,
+                                       NULL,
+                                       1U));
+    current_task = suspended_task.handle;
     scheduler_state = taskSCHEDULER_SUSPENDED;
-    TEST_ASSERT_EQUAL(ERROR_CODE_UNSUPPORTED, rtos_task_delete(&task));
+    TEST_ASSERT_EQUAL(ERROR_CODE_UNSUPPORTED, rtos_task_delete(&suspended_task));
     TEST_ASSERT_EQUAL(ERROR_CODE_NOT_READY, rtos_scheduler_start());
     TEST_ASSERT_TRUE(scheduler_started);
 }

@@ -36,14 +36,11 @@ flowchart LR
 ## 公開インターフェース
 
 ```c
-#include <stdbool.h>
-
 typedef void (*rtos_task_entry_t)(void *parameter);
 
 typedef struct {
     TaskHandle_t handle;
     StaticTask_t task_buffer;
-    bool cleanup_pending;
 } rtos_task_t;
 
 error_code_t rtos_task_init(rtos_task_t *task);
@@ -59,9 +56,9 @@ error_code_t rtos_task_delete(rtos_task_t *task);
 ```
 
 - `rtos_task_init`は新しい制御領域に対して一度だけ呼び出す。タスク削除後も含め、同じ制御領域を再初期化してはならない。
-- `rtos_task_create`は`xTaskCreateStatic`を呼び出す。同一の`rtos_task_t`を重複して生成することはできない。スケジューラ開始前に選択中タスクを削除した場合、FreeRTOSのIdleタスクによるTCB後処理まで制御領域を再利用できないため、同じ`rtos_task_t`での再生成を拒否する。
-- `rtos_scheduler_start`は`vTaskStartScheduler`を呼び出す。正常に開始した場合は復帰しない。復帰した場合は`ERROR_CODE_NOT_READY`を返す。
-- `rtos_task_delete`は、スケジューラ開始後は他タスクだけを削除できる。スケジューラ開始前の削除は許可し、実行中またはスケジューリング一時停止中に自身を削除しようとした場合は`ERROR_CODE_UNSUPPORTED`を返す。
+- `rtos_task_create`は`xTaskCreateStatic`を呼び出す。同一の`rtos_task_t`を重複して生成することはできない。
+- `rtos_scheduler_start`はSchedulerが未開始の場合だけ`vTaskStartScheduler`を呼び出す。Schedulerが実行中または一時停止中の場合は`ERROR_CODE_UNSUPPORTED`を返す。正常に開始した場合は復帰せず、復帰した場合は`ERROR_CODE_NOT_READY`を返す。
+- `rtos_task_delete`は、現在選択中のタスクをScheduler開始前も含めて削除せず、`ERROR_CODE_UNSUPPORTED`を返す。これはScheduler開始時に削除済みのタスクが実行対象として残ることを防ぐ。その他のタスクは削除できる。
 
 ## 処理フロー
 
@@ -82,11 +79,11 @@ sequenceDiagram
 
 ## RTOS・ハードウェア上の考慮
 
-- 実行コンテキスト: 初期化・生成・開始・削除はタスク文脈またはスケジューラ開始前の文脈で使用する。ISRからは呼び出さない。
+- 実行コンテキスト: 初期化・生成・削除はタスク文脈またはスケジューラ開始前の文脈で使用する。スケジューラ開始は未開始状態でのみ呼び出す。ISRからは呼び出さない。
 - メモリとスタック: TCBは`rtos_task_t`内に静的確保する。スタックは呼び出し側が静的領域として所有し、要素数を`StackType_t`単位で指定する。
 - 同期: 作成・削除と`rtos_task_t`へのアクセスは呼び出し側が直列化する。
 
 ## 検証方法
 
-- ホスト単体テストで、引数検証、生成、重複生成、削除、開始前の削除後に同じTCB領域を再利用できないこと、自己削除拒否およびスケジューラ開始失敗時の結果を確認する。
+- ホスト単体テストで、引数検証、生成、重複生成、削除、選択中タスクの削除拒否、Scheduler開始状態の検証およびスケジューラ開始失敗時の結果を確認する。
 - Debugファームウェアをビルドし、FreeRTOS静的タスクAPIとのリンクを確認する。

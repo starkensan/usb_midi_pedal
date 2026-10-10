@@ -27,7 +27,7 @@ error_code_t rtos_task_create(rtos_task_t *task,
         || (priority >= (UBaseType_t)configMAX_PRIORITIES)) {
         return ERROR_CODE_OUT_OF_RANGE;
     }
-    if ((task->handle != NULL) || task->cleanup_pending) {
+    if (task->handle != NULL) {
         return ERROR_CODE_NOT_READY;
     }
 
@@ -43,6 +43,10 @@ error_code_t rtos_task_create(rtos_task_t *task,
 
 error_code_t rtos_scheduler_start(void)
 {
+    if (xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED) {
+        return ERROR_CODE_UNSUPPORTED;
+    }
+
     vTaskStartScheduler();
     return ERROR_CODE_NOT_READY;
 }
@@ -55,14 +59,11 @@ error_code_t rtos_task_delete(rtos_task_t *task)
     if (task->handle == NULL) {
         return ERROR_CODE_NOT_READY;
     }
-    const BaseType_t scheduler_state = xTaskGetSchedulerState();
-    const bool deleting_current_task = task->handle == xTaskGetCurrentTaskHandle();
-    if ((scheduler_state != taskSCHEDULER_NOT_STARTED) && deleting_current_task) {
+    if (task->handle == xTaskGetCurrentTaskHandle()) {
         return ERROR_CODE_UNSUPPORTED;
     }
 
     vTaskDelete(task->handle);
-    task->cleanup_pending = (scheduler_state == taskSCHEDULER_NOT_STARTED) && deleting_current_task;
     task->handle = NULL;
     return ERROR_CODE_OK;
 }

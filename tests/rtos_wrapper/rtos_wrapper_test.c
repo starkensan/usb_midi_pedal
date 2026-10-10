@@ -304,7 +304,7 @@ void test_task_wrapper_creates_deletes_and_validates_lifecycle(void)
     TEST_ASSERT_EQUAL(ERROR_CODE_NOT_READY, rtos_task_delete(&task));
 }
 
-void test_task_wrapper_rejects_self_deletion_after_scheduler_start(void)
+void test_task_wrapper_rejects_self_deletion_in_all_scheduler_states(void)
 {
     rtos_task_t task = {0};
     rtos_task_t suspended_task = {0};
@@ -313,9 +313,11 @@ void test_task_wrapper_rejects_self_deletion_after_scheduler_start(void)
 
     TEST_ASSERT_EQUAL(ERROR_CODE_OK, rtos_task_create(&task, test_task_entry, "test", stack, 4U, NULL, 1U));
     current_task = task.handle;
+    TEST_ASSERT_EQUAL(ERROR_CODE_UNSUPPORTED, rtos_task_delete(&task));
+    TEST_ASSERT_NOT_NULL(task.handle);
+    TEST_ASSERT_NULL(deleted_task);
+    current_task = NULL;
     TEST_ASSERT_EQUAL(ERROR_CODE_OK, rtos_task_delete(&task));
-    TEST_ASSERT_EQUAL(ERROR_CODE_NOT_READY,
-                      rtos_task_create(&task, test_task_entry, "test", stack, 4U, NULL, 1U));
 
     TEST_ASSERT_EQUAL(ERROR_CODE_OK,
                       rtos_task_create(&suspended_task,
@@ -328,6 +330,14 @@ void test_task_wrapper_rejects_self_deletion_after_scheduler_start(void)
     current_task = suspended_task.handle;
     scheduler_state = taskSCHEDULER_SUSPENDED;
     TEST_ASSERT_EQUAL(ERROR_CODE_UNSUPPORTED, rtos_task_delete(&suspended_task));
+    TEST_ASSERT_EQUAL(ERROR_CODE_UNSUPPORTED, rtos_scheduler_start());
+    TEST_ASSERT_FALSE(scheduler_started);
+
+    scheduler_state = taskSCHEDULER_RUNNING;
+    TEST_ASSERT_EQUAL(ERROR_CODE_UNSUPPORTED, rtos_scheduler_start());
+    TEST_ASSERT_FALSE(scheduler_started);
+
+    scheduler_state = taskSCHEDULER_NOT_STARTED;
     TEST_ASSERT_EQUAL(ERROR_CODE_NOT_READY, rtos_scheduler_start());
     TEST_ASSERT_TRUE(scheduler_started);
 }
@@ -385,7 +395,7 @@ int main(void)
     RUN_TEST(test_mailbox_reports_result_codes_and_count);
     RUN_TEST(test_semaphore_and_mutex_report_timeout);
     RUN_TEST(test_task_wrapper_creates_deletes_and_validates_lifecycle);
-    RUN_TEST(test_task_wrapper_rejects_self_deletion_after_scheduler_start);
+    RUN_TEST(test_task_wrapper_rejects_self_deletion_in_all_scheduler_states);
     RUN_TEST(test_timer_initializes_and_reports_command_failure);
     RUN_TEST(test_delay_waits_for_relative_and_periodic_intervals);
     return UNITY_END();

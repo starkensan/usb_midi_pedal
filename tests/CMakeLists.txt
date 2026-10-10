@@ -97,6 +97,7 @@ add_executable(rtos_wrapper_test
     ${PROJECT_SOURCE_DIR}/src/lib/rtos_wrapper/mailbox.c
     ${PROJECT_SOURCE_DIR}/src/lib/rtos_wrapper/mutex.c
     ${PROJECT_SOURCE_DIR}/src/lib/rtos_wrapper/semaphore.c
+    ${PROJECT_SOURCE_DIR}/src/app/tasks/rtos_task.c
     ${PROJECT_SOURCE_DIR}/src/lib/rtos_wrapper/timer.c
 )
 target_include_directories(rtos_wrapper_test PRIVATE

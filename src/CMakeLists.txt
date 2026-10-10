@@ -17,6 +17,7 @@ add_executable(usb_midi_pedal
     drivers/usb_midi/usb_midi_descriptors.c
     app/app_controller/app_state_machine.c
     app/tasks/usb_midi_task.c
+    app/tasks/rtos_task.c
 )
 
 target_include_directories(usb_midi_pedal PRIVATE

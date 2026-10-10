@@ -7,12 +7,18 @@
 #include "lib/rtos_wrapper/mailbox.h"
 #include "lib/rtos_wrapper/mutex.h"
 #include "lib/rtos_wrapper/semaphore.h"
+#include "app/tasks/rtos_task.h"
 #include "lib/rtos_wrapper/timer.h"
 
 static BaseType_t queue_result;
 static BaseType_t semaphore_result;
 static EventBits_t event_bits;
 static UBaseType_t queue_count;
+static TaskHandle_t current_task;
+static TaskHandle_t task_create_result;
+static TaskHandle_t deleted_task;
+static bool scheduler_started;
+static BaseType_t scheduler_state;
 static BaseType_t timer_command_result;
 static BaseType_t timer_create_result;
 static TickType_t tick_count;
@@ -170,12 +176,54 @@ BaseType_t xSemaphoreGive(SemaphoreHandle_t semaphore)
     return semaphore_result;
 }
 
+TaskHandle_t xTaskCreateStatic(TaskFunction_t entry,
+                               const char *name,
+                               configSTACK_DEPTH_TYPE stack_depth,
+                               void *parameter,
+                               UBaseType_t priority,
+                               StackType_t *stack_buffer,
+                               StaticTask_t *task_buffer)
+{
+    (void)entry;
+    (void)name;
+    (void)stack_depth;
+    (void)parameter;
+    (void)priority;
+    (void)stack_buffer;
+    return task_create_result != NULL ? task_create_result : task_buffer;
+}
+
+void vTaskStartScheduler(void)
+{
+    scheduler_started = true;
+}
+
+void vTaskDelete(TaskHandle_t task)
+{
+    deleted_task = task;
+}
+
+TaskHandle_t xTaskGetCurrentTaskHandle(void)
+{
+    return current_task;
+}
+
+BaseType_t xTaskGetSchedulerState(void)
+{
+    return scheduler_state;
+}
+
 void setUp(void)
 {
     queue_result = pdPASS;
     semaphore_result = pdPASS;
     event_bits = 0U;
     queue_count = 0U;
+    current_task = NULL;
+    task_create_result = NULL;
+    deleted_task = NULL;
+    scheduler_started = false;
+    scheduler_state = taskSCHEDULER_NOT_STARTED;
     timer_command_result = pdPASS;
     timer_create_result = pdPASS;
     tick_count = 0U;
@@ -231,6 +279,69 @@ void test_semaphore_and_mutex_report_timeout(void)
     TEST_ASSERT_EQUAL(ERROR_CODE_TIMEOUT, mutex_lock(&mutex, 0U));
 }
 
+static void test_task_entry(void *parameter)
+{
+    (void)parameter;
+}
+
+void test_task_wrapper_creates_deletes_and_validates_lifecycle(void)
+{
+    rtos_task_t task = {0};
+    StackType_t stack[4] = {0};
+
+    TEST_ASSERT_EQUAL(ERROR_CODE_INVALID_ARGUMENT, rtos_task_init(NULL));
+    TEST_ASSERT_EQUAL(ERROR_CODE_OK, rtos_task_init(&task));
+    TEST_ASSERT_EQUAL(ERROR_CODE_INVALID_ARGUMENT,
+                      rtos_task_create(NULL, test_task_entry, "test", stack, 4U, NULL, 1U));
+    TEST_ASSERT_EQUAL(ERROR_CODE_OUT_OF_RANGE,
+                      rtos_task_create(&task, test_task_entry, "test", stack, 0U, NULL, 1U));
+    TEST_ASSERT_EQUAL(ERROR_CODE_OK,
+                      rtos_task_create(&task, test_task_entry, "test", stack, 4U, NULL, 1U));
+    TEST_ASSERT_EQUAL(ERROR_CODE_NOT_READY,
+                      rtos_task_create(&task, test_task_entry, "test", stack, 4U, NULL, 1U));
+    TEST_ASSERT_EQUAL(ERROR_CODE_OK, rtos_task_delete(&task));
+    TEST_ASSERT_NOT_NULL(deleted_task);
+    TEST_ASSERT_EQUAL(ERROR_CODE_NOT_READY, rtos_task_delete(&task));
+}
+
+void test_task_wrapper_rejects_self_deletion_in_all_scheduler_states(void)
+{
+    rtos_task_t task = {0};
+    rtos_task_t suspended_task = {0};
+    StackType_t stack[4] = {0};
+    StackType_t suspended_stack[4] = {0};
+
+    TEST_ASSERT_EQUAL(ERROR_CODE_OK, rtos_task_create(&task, test_task_entry, "test", stack, 4U, NULL, 1U));
+    current_task = task.handle;
+    TEST_ASSERT_EQUAL(ERROR_CODE_UNSUPPORTED, rtos_task_delete(&task));
+    TEST_ASSERT_NOT_NULL(task.handle);
+    TEST_ASSERT_NULL(deleted_task);
+    current_task = NULL;
+    TEST_ASSERT_EQUAL(ERROR_CODE_OK, rtos_task_delete(&task));
+
+    TEST_ASSERT_EQUAL(ERROR_CODE_OK,
+                      rtos_task_create(&suspended_task,
+                                       test_task_entry,
+                                       "test",
+                                       suspended_stack,
+                                       4U,
+                                       NULL,
+                                       1U));
+    current_task = suspended_task.handle;
+    scheduler_state = taskSCHEDULER_SUSPENDED;
+    TEST_ASSERT_EQUAL(ERROR_CODE_UNSUPPORTED, rtos_task_delete(&suspended_task));
+    TEST_ASSERT_EQUAL(ERROR_CODE_UNSUPPORTED, rtos_scheduler_start());
+    TEST_ASSERT_FALSE(scheduler_started);
+
+    scheduler_state = taskSCHEDULER_RUNNING;
+    TEST_ASSERT_EQUAL(ERROR_CODE_UNSUPPORTED, rtos_scheduler_start());
+    TEST_ASSERT_FALSE(scheduler_started);
+
+    scheduler_state = taskSCHEDULER_NOT_STARTED;
+    TEST_ASSERT_EQUAL(ERROR_CODE_NOT_READY, rtos_scheduler_start());
+    TEST_ASSERT_TRUE(scheduler_started);
+}
+
 static void timer_callback(TimerHandle_t timer)
 {
     (void)timer;
@@ -283,6 +394,8 @@ int main(void)
     RUN_TEST(test_event_flags_reports_invalid_range_timeout_and_value);
     RUN_TEST(test_mailbox_reports_result_codes_and_count);
     RUN_TEST(test_semaphore_and_mutex_report_timeout);
+    RUN_TEST(test_task_wrapper_creates_deletes_and_validates_lifecycle);
+    RUN_TEST(test_task_wrapper_rejects_self_deletion_in_all_scheduler_states);
     RUN_TEST(test_timer_initializes_and_reports_command_failure);
     RUN_TEST(test_delay_waits_for_relative_and_periodic_intervals);
     return UNITY_END();

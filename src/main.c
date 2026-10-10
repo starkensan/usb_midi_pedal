@@ -5,6 +5,7 @@
 
 #include "app/tasks/usb_midi_task.h"
 #include "board/board_config.h"
+#include "board/input_i2c.h"
 #include "drivers/rgb_led/rgb_led.h"
 #include "drivers/usb_cdc/usb_cdc.h"
 #include "drivers/usb_midi/usb_midi.h"
@@ -46,6 +47,10 @@ void vApplicationStackOverflowHook(TaskHandle_t task, char *task_name)
 
 int main(void)
 {
+    if (!board_input_i2c_init()) {
+        return 1;
+    }
+
     if (!usb_midi_init()) {
         return 1;
     }

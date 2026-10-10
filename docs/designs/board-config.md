@@ -6,7 +6,7 @@
 - 対応Issue: #28
 - 対象: Pimoroni Tiny 2040のピンおよびペリフェラル設定
 
-`src/board/board_config.h`は、製品基板に固有のGPIO、I2CおよびUARTの設定値を一元管理する。
+`src/board/board_config.h`は、製品基板に固有のGPIO、I2CおよびUARTの設定値を一元管理する。`src/board/input_i2c.c`は、共有入力I2C1の初期化を担う。
 
 ## スコープ
 
@@ -20,7 +20,7 @@
 
 ### 対象外
 
-- GPIOおよび周辺機能の初期化
+- OLED I2C0およびUARTの初期化
 - I2CおよびUARTの通信処理
 - 未使用GPIOの割り当て
 
@@ -30,11 +30,15 @@
 flowchart LR
     display[display driver] --> config[board_config.h]
     input[input drivers] --> config
+    startup[main] --> init[input_i2c.c]
+    init --> config
+    init --> pico[Pico SDK]
     config --> pico[Pico SDK hardware headers]
 ```
 
-- `board_config.h`は基板固有の定数だけを提供する。
-- GPIO初期化と通信制御は`drivers`が担う。
+- `board_config.h`は基板固有の定数を提供する。
+- `board_input_i2c_init()`は共有I2C1の通信速度、ピン機能、内部プルアップを設定する。起動時に`main()`から一度だけ呼び出す。
+- デバイス固有のI2C通信は各ドライバが担う。
 - Pico SDKへの依存は`board`内に閉じ込める。
 
 ## 公開インターフェース
@@ -44,6 +48,7 @@ flowchart LR
 - `BOARD_OLED_I2C_*`: OLED専用I2C0のインスタンス、ピン、アドレス
 - `BOARD_INPUT_I2C_*`: ADS1015およびMCP23017共有のI2C1のインスタンス、ピン
 - `BOARD_I2C_BAUD_RATE_HZ`: 両I2Cバスの通信速度
+- `BOARD_INPUT_I2C_TIMEOUT_US`: 共有入力I2C1の各通信操作のタイムアウト
 - `BOARD_EXPRESSION_ADC_READY_PIN`: ADS1015のData Ready入力ピン
 - `BOARD_DIN_MIDI_UART_*`: DIN MIDI出力用UART
 - `BOARD_DEBUG_UART_*`: デバッグUART
@@ -51,6 +56,8 @@ flowchart LR
 - `BOARD_RGB_LED_*`: 内蔵RGB LEDのR/G/B各チャネルのGPIOと極性
 
 I2CおよびUARTのインスタンスはPico SDKの`i2c0`、`i2c1`、`uart0`、`uart1`を用いる。OLEDは`i2c0`、入力系デバイスは`i2c1`を用いる。
+
+`input_i2c.h`は`bool board_input_i2c_init(void)`を公開する。初期化失敗時は`false`を返す。
 
 ## 検証方針
 

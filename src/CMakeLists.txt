@@ -1,5 +1,6 @@
 add_executable(usb_midi_pedal
     main.c
+    board/input_i2c.c
     lib/rtos_wrapper/event_flags.c
     lib/rtos_wrapper/mailbox.c
     lib/rtos_wrapper/mutex.c
@@ -12,6 +13,7 @@ add_executable(usb_midi_pedal
     drivers/log_output/log_output.c
     drivers/rgb_led/rgb_led.c
     drivers/debug_uart/debug_uart.c
+    drivers/footswitch/footswitch.c
     drivers/usb_cdc/usb_cdc.c
     drivers/usb_midi/usb_midi.c
     drivers/usb_midi/usb_midi_descriptors.c
@@ -22,6 +24,7 @@ add_executable(usb_midi_pedal
 target_include_directories(usb_midi_pedal PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}
     ${CMAKE_CURRENT_LIST_DIR}/drivers/debug_uart
+    ${CMAKE_CURRENT_LIST_DIR}/drivers/footswitch
     ${CMAKE_CURRENT_LIST_DIR}/drivers/log_output
     ${CMAKE_CURRENT_LIST_DIR}/drivers/usb_cdc
     ${CMAKE_CURRENT_LIST_DIR}/drivers/usb_midi

@@ -44,8 +44,9 @@ bool flash_storage_erase(const flash_storage_t *storage, size_t offset, size_t l
 
 /**
  * Program a non-empty page-aligned range in the configured region.
- * The source must be readable from SRAM while flash is unavailable; it must
- * not point into the XIP flash address space.
+ * The entire source range must be inside RP2040 SRAM while flash is
+ * unavailable. XIP, NOALLOC, NOCACHE, NOCACHE_NOALLOC, and other non-SRAM
+ * address ranges are rejected.
  */
 bool flash_storage_write(const flash_storage_t *storage, size_t offset,
                          const uint8_t *src, size_t length);

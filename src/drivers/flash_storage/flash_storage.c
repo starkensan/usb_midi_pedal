@@ -13,8 +13,6 @@
 #endif
 
 #define FLASH_STORAGE_SAFE_EXECUTE_TIMEOUT_MS 1000U
-#define FLASH_STORAGE_XIP_WINDOW_SIZE 0x01000000U
-
 extern uint8_t __flash_binary_end;
 
 typedef struct {
@@ -34,15 +32,15 @@ static bool range_is_valid(const flash_storage_t *storage, size_t offset, size_t
            (offset <= storage->capacity) && (length <= (storage->capacity - offset));
 }
 
-static bool buffer_is_outside_xip(const void *buffer, size_t length)
+static bool buffer_is_in_sram(const void *buffer, size_t length)
 {
     const uintptr_t buffer_start = (uintptr_t)buffer;
-    const uintptr_t buffer_end = buffer_start + length;
-    const uintptr_t xip_start = (uintptr_t)XIP_BASE;
-    const uintptr_t xip_end = xip_start + FLASH_STORAGE_XIP_WINDOW_SIZE;
+    const uintptr_t sram_start = (uintptr_t)SRAM_BASE;
+    const uintptr_t sram_end = (uintptr_t)SRAM_END;
 
-    return (buffer_end >= buffer_start) &&
-           !((buffer_start < xip_end) && (buffer_end > xip_start));
+    return (length > 0U) && (buffer_start >= sram_start) &&
+           (buffer_start < sram_end) &&
+           (length <= (size_t)(sram_end - buffer_start));
 }
 
 static void __not_in_flash_func(erase_flash_region)(void *context)
@@ -100,7 +98,7 @@ bool flash_storage_init(flash_storage_t *storage, const flash_storage_region_t *
 bool flash_storage_read(const flash_storage_t *storage, size_t offset, void *dst, size_t length)
 {
     if (!range_is_valid(storage, offset, length) || (dst == NULL) ||
-        !buffer_is_outside_xip(dst, length)) {
+        !buffer_is_in_sram(dst, length)) {
         return false;
     }
 
@@ -134,7 +132,7 @@ bool flash_storage_write(const flash_storage_t *storage, size_t offset,
         return false;
     }
 
-    if (!buffer_is_outside_xip(src, length)) {
+    if (!buffer_is_in_sram(src, length)) {
         return false;
     }
 

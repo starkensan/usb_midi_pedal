@@ -12,6 +12,7 @@
 | 仕様 | [specifications/README.md](specifications/README.md) | 確定したハードウェア仕様とGPIO割り当て |
 | 設計 | [designs/README.md](designs/README.md) | アーキテクチャ、設計判断、機能・モジュールごとの設計 |
 | 作成済み | [designs/adc-selection.md](designs/adc-selection.md) | I2C ADC候補の比較とADS1015採用判断 |
+| 作成済み | [designs/expression-driver.md](designs/expression-driver.md) | ADS1015 EXP入力ドライバの設定、通知、読み出し |
 | 作成済み | [designs/runtime-architecture.md](designs/runtime-architecture.md) | 状態機械、タスク、モジュール境界、保存、将来のデュアルコア移行方針 |
 | 作成済み | [designs/rtos-mailbox.md](designs/rtos-mailbox.md) | FreeRTOSタスク間で固定長メッセージを受け渡す静的メールボックス |
 | 作成済み | [designs/rtos-synchronization.md](designs/rtos-synchronization.md) | Event Flag、Semaphore、Mutexによる静的なRTOS同期機能 |

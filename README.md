@@ -3,6 +3,7 @@
 Pimoroni Tiny 2040を使用した、拡張可能なUSB/DIN MIDIフットペダルのファームウェアプロジェクトです。
 
 現在は最小FreeRTOSファームウェアとUSB MIDI OUT（Program Change、Control Change）を実装済みです。
+ADS1015 EXP入力ドライバは実装済みで、実機確認待ちです。
 
 ## 想定ハードウェア
 
@@ -105,3 +106,4 @@ PowerShellまたはWSLターミナルを1つずつ起動します。
 - [x] 最小FreeRTOS起動とRGB LED点滅タスク
 - [x] プロジェクト固有のピン定義
 - [x] USB MIDI OUT実装（Program Change、Control Change）
+- [x] ADS1015 EXP入力ドライバ（実機確認待ち）

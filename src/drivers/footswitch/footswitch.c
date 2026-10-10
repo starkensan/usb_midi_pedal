@@ -15,7 +15,7 @@ static bool write_register(uint8_t reg, uint8_t value)
     const uint8_t data[2] = {reg, value};
     return i2c_write_timeout_us(BOARD_INPUT_I2C_INSTANCE,
                                 BOARD_FOOTSWITCH_EXPANDER_I2C_ADDRESS,
-                                data, sizeof(data), true,
+                                data, sizeof(data), false,
                                 BOARD_INPUT_I2C_TIMEOUT_US) == (int)sizeof(data);
 }
 

@@ -53,8 +53,35 @@ static bool display_write_command_pair(uint8_t command, uint8_t value)
     return display_write_bytes(packet, sizeof(packet));
 }
 
+static bool display_write_page_internal(uint8_t page, const uint8_t *pixels, size_t length)
+{
+    uint8_t packet[DISPLAY_WIDTH + 1u];
+    uint8_t column;
+
+    if ((page >= DISPLAY_PAGE_COUNT) || (pixels == NULL) || (length != DISPLAY_WIDTH))
+    {
+        return false;
+    }
+
+    if (!display_write_raw_command((uint8_t)(0xb0u | page)) ||
+        !display_write_raw_command((uint8_t)(0x00u | (DISPLAY_COLUMN_OFFSET & 0x0fu))) ||
+        !display_write_raw_command((uint8_t)(0x10u | ((DISPLAY_COLUMN_OFFSET >> 4u) & 0x0fu))))
+    {
+        return false;
+    }
+
+    packet[0] = DISPLAY_CONTROL_DATA;
+    for (column = 0u; column < DISPLAY_WIDTH; ++column)
+    {
+        packet[column + 1u] = pixels[column];
+    }
+
+    return display_write_bytes(packet, sizeof(packet));
+}
+
 bool display_init(uint8_t address)
 {
+    static const uint8_t blank_page[DISPLAY_WIDTH] = {0u};
     static const struct
     {
         uint8_t command;
@@ -108,39 +135,32 @@ bool display_init(uint8_t address)
         }
     }
 
+    for (index = 0u; index < DISPLAY_PAGE_COUNT; ++index)
+    {
+        if (!display_write_page_internal((uint8_t)index, blank_page, sizeof(blank_page)))
+        {
+            return false;
+        }
+    }
+
     /* Display on. */
     if (!display_write_raw_command(0xafu))
     {
         return false;
     }
 
+    sleep_ms(100u);
     display_is_initialized = true;
     return true;
 }
 
 bool display_write_page(uint8_t page, const uint8_t *pixels, size_t length)
 {
-    uint8_t packet[DISPLAY_WIDTH + 1u];
-    uint8_t column;
-
     if (!display_is_initialized || (page >= DISPLAY_PAGE_COUNT) ||
         (pixels == NULL) || (length != DISPLAY_WIDTH))
     {
         return false;
     }
 
-    if (!display_write_command((uint8_t)(0xb0u | page)) ||
-        !display_write_command((uint8_t)(0x00u | (DISPLAY_COLUMN_OFFSET & 0x0fu))) ||
-        !display_write_command((uint8_t)(0x10u | ((DISPLAY_COLUMN_OFFSET >> 4u) & 0x0fu))) )
-    {
-        return false;
-    }
-
-    packet[0] = DISPLAY_CONTROL_DATA;
-    for (column = 0u; column < DISPLAY_WIDTH; ++column)
-    {
-        packet[column + 1u] = pixels[column];
-    }
-
-    return display_write_bytes(packet, sizeof(packet));
+    return display_write_page_internal(page, pixels, length);
 }

@@ -31,10 +31,12 @@ bool display_write_command(uint8_t command);
 bool display_write_page(uint8_t page, const uint8_t *pixels, size_t length);
 ```
 
-- `address`は`0x3C`または`0x3D`のみ。`page`は0〜7、`length`は最大128で、各バイトが縦8画素を表す。
+- `address`は`0x3C`または`0x3D`のみ。`page`は0〜7、`length`は128固定で、各バイトが縦8画素を表す。
 - 転送元の所有権は呼び出し側にあり、同期転送終了まで有効にする。NACK、不正引数、初期化前呼出しは`false`。
 - `length`は128列ちょうどを要求する。SH1106の132列RAMに対する128列の可視領域オフセットは2列としてドライバで吸収する。
 - バスはboard設定に従いI2C0、GP0/GP1、400 kHzで初期化する。初期化時のI2C転送はタイムアウト付き同期転送とする。
+- `display_init`はコントローラ設定後、表示を有効にする前に内部ページ転送処理で8ページ全てへ128バイトのゼロを書き込む。初期化前にも使える内部処理を公開ページAPIと共有し、公開APIでは初期化済み状態と引数を検証する。
+- 表示オンコマンド送信後に100 ms待機してから初期化済み状態にし、成功を返す。ページ初期化または表示オン転送が失敗した場合は`false`を返し、未初期化状態を維持する。
 - フォント、UI状態、描画用フレームバッファは本ドライバに含めず、別の`lib/graphics`で扱う。
 
 ## 処理フロー
@@ -45,7 +47,10 @@ sequenceDiagram
     participant Display as SH1106ドライバ
     participant OLED as SH1106
     UI->>Display: display_init(address)
-    Display->>OLED: 電源・表示・アドレス設定コマンド
+    Display->>OLED: 電源・コントローラ設定コマンド
+    Display->>OLED: 全8ページへゼロを書き込み
+    Display->>OLED: 表示オン
+    Display->>Display: 100 ms待機後、初期化済みに設定
     UI->>Display: display_write_page(page, pixels, length)
     Display->>OLED: ページ/列指定とデータ転送
     Display-->>UI: 成否

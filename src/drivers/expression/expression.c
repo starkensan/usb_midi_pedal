@@ -26,20 +26,22 @@ static bool write_register(uint8_t reg, uint16_t value)
         (uint8_t)value,
     };
 
-    return i2c_write_blocking(BOARD_INPUT_I2C_INSTANCE,
-                              BOARD_EXPRESSION_ADC_I2C_ADDRESS,
-                              bytes,
-                              sizeof(bytes),
-                              false) == (int)sizeof(bytes);
+    return i2c_write_timeout_us(BOARD_INPUT_I2C_INSTANCE,
+                                BOARD_EXPRESSION_ADC_I2C_ADDRESS,
+                                bytes,
+                                sizeof(bytes),
+                                false,
+                                BOARD_INPUT_I2C_TIMEOUT_US) == (int)sizeof(bytes);
 }
 
 static bool select_register(uint8_t reg)
 {
-    return i2c_write_blocking(BOARD_INPUT_I2C_INSTANCE,
-                              BOARD_EXPRESSION_ADC_I2C_ADDRESS,
-                              &reg,
-                              1u,
-                              true) == 1;
+    return i2c_write_timeout_us(BOARD_INPUT_I2C_INSTANCE,
+                                BOARD_EXPRESSION_ADC_I2C_ADDRESS,
+                                &reg,
+                                1u,
+                                true,
+                                BOARD_INPUT_I2C_TIMEOUT_US) == 1;
 }
 
 static void data_ready_gpio_callback(uint gpio, uint32_t events)
@@ -54,12 +56,6 @@ bool expression_init(void)
 {
     initialized = false;
     data_ready = false;
-
-    (void)i2c_init(BOARD_INPUT_I2C_INSTANCE, BOARD_I2C_BAUD_RATE_HZ);
-    gpio_set_function(BOARD_INPUT_I2C_SDA_PIN, GPIO_FUNC_I2C);
-    gpio_set_function(BOARD_INPUT_I2C_SCL_PIN, GPIO_FUNC_I2C);
-    gpio_pull_up(BOARD_INPUT_I2C_SDA_PIN);
-    gpio_pull_up(BOARD_INPUT_I2C_SCL_PIN);
 
     gpio_set_irq_enabled(BOARD_EXPRESSION_ADC_READY_PIN,
                          GPIO_IRQ_EDGE_FALL,
@@ -98,17 +94,27 @@ bool expression_take_ready(void)
 bool expression_read_raw(uint16_t *sample)
 {
     uint8_t bytes[2];
+    uint16_t raw;
+    int16_t signed_sample;
 
     if (!initialized || (sample == NULL) ||
         !select_register(ADS1015_REGISTER_CONVERSION) ||
-        (i2c_read_blocking(BOARD_INPUT_I2C_INSTANCE,
-                           BOARD_EXPRESSION_ADC_I2C_ADDRESS,
-                           bytes,
-                           sizeof(bytes),
-                           false) != (int)sizeof(bytes))) {
+        (i2c_read_timeout_us(BOARD_INPUT_I2C_INSTANCE,
+                             BOARD_EXPRESSION_ADC_I2C_ADDRESS,
+                             bytes,
+                             sizeof(bytes),
+                             false,
+                             BOARD_INPUT_I2C_TIMEOUT_US) != (int)sizeof(bytes))) {
         return false;
     }
 
-    *sample = (uint16_t)((((uint16_t)bytes[0] << 8) | bytes[1]) >> 4);
+    raw = (uint16_t)((((uint16_t)bytes[0] << 8) | bytes[1]) >> 4);
+    if ((raw & 0x0800u) != 0u) {
+        signed_sample = (int16_t)(raw | 0xf000u);
+    } else {
+        signed_sample = (int16_t)raw;
+    }
+
+    *sample = (signed_sample < 0) ? 0u : (uint16_t)signed_sample;
     return true;
 }

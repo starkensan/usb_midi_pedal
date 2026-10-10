@@ -17,10 +17,12 @@
 flowchart LR
     app[app 入力タスク] --> driver[drivers/expression]
     driver --> board[board_config.h]
+    startup[起動処理] --> boardinit[board_input_i2c_init]
+    boardinit --> bus[I2C1共有バス]
     driver --> pico[Pico SDK I2C/GPIO]
 ```
 
-- ADS1015はI2C1の`0x48`。MCP23017とバスを共有し、呼び出し側がアクセスを直列化する。初期化時にドライバがI2C1を設定する。Pico SDK APIとGPIO割り込み処理はドライバ内に閉じ込める。
+- ADS1015はI2C1の`0x48`。MCP23017とバスを共有し、呼び出し側がアクセスを直列化する。共有バスは起動時に`board_input_i2c_init()`で一度初期化し、EXPドライバはADS1015設定とGPIO割り込みを担当する。Pico SDK APIとGPIO割り込み処理はドライバ内に閉じ込める。
 
 ## 公開インターフェース
 
@@ -31,7 +33,8 @@ bool expression_read_raw(uint16_t *sample);
 ```
 
 - `take_ready`はISRで記録したData Readyを消費する非ブロッキング操作。ISRでI2C通信を行わない。
-- `read_raw`は変換レジスタの上位12 bitを取り出す。単一エンド入力の有効範囲は0〜2047。失敗時は出力を変更しない。
+- `read_raw`は変換レジスタの符号付き12 bit値を解釈し、負値を0へクランプする。公開値の範囲は0〜2047。失敗時は出力を変更しない。
+- レジスタ書込、ポインタ選択、変換値読出しは有限のSDK I2Cタイムアウトを指定し、通信失敗またはタイムアウト時に`false`を返す。
 - 初期化失敗、I2C失敗、NULL出力を`false`で返す。複数タスクからの同時利用は想定しない。
 - GPIO ISRはreadyフラグだけを設定し、`take_ready`は割り込みを短時間無効化してフラグを消費する。割り込みを取りこぼさず安全にタスクへ渡す。
 

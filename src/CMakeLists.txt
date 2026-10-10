@@ -1,5 +1,6 @@
 add_executable(usb_midi_pedal
     main.c
+    board/input_i2c.c
     lib/rtos_wrapper/event_flags.c
     lib/rtos_wrapper/mailbox.c
     lib/rtos_wrapper/mutex.c

@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-/* Initialize the shared input I2C bus and MCP23017 footswitch inputs. */
+/* Initialize MCP23017 footswitch inputs. The shared I2C1 bus must be initialized first. */
 bool footswitch_init(void);
 
 /* Read GPA0..GPA5, normalized to pressed=1. Upper two bits are always zero. */

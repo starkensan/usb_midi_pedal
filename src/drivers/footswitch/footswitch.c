@@ -4,8 +4,6 @@
 
 #include "board/board_config.h"
 
-#include "hardware/gpio.h"
-
 #define MCP23017_REG_IODIRA 0x00u
 #define MCP23017_REG_IPOLA  0x02u
 #define MCP23017_REG_GPPUA  0x0cu
@@ -15,17 +13,14 @@
 static bool write_register(uint8_t reg, uint8_t value)
 {
     const uint8_t data[2] = {reg, value};
-    return i2c_write_blocking(BOARD_INPUT_I2C_INSTANCE,
-                              BOARD_FOOTSWITCH_EXPANDER_I2C_ADDRESS,
-                              data, sizeof(data), true) == (int)sizeof(data);
+    return i2c_write_timeout_us(BOARD_INPUT_I2C_INSTANCE,
+                                BOARD_FOOTSWITCH_EXPANDER_I2C_ADDRESS,
+                                data, sizeof(data), true,
+                                BOARD_INPUT_I2C_TIMEOUT_US) == (int)sizeof(data);
 }
 
 bool footswitch_init(void)
 {
-    i2c_init(BOARD_INPUT_I2C_INSTANCE, BOARD_I2C_BAUD_RATE_HZ);
-    gpio_set_function(BOARD_INPUT_I2C_SDA_PIN, GPIO_FUNC_I2C);
-    gpio_set_function(BOARD_INPUT_I2C_SCL_PIN, GPIO_FUNC_I2C);
-
     /* Inputs are externally pulled up; keep all Port A pins high impedance. */
     if (!write_register(MCP23017_REG_IODIRA, 0xffu)) {
         return false;
@@ -48,14 +43,16 @@ bool footswitch_read(uint8_t *pressed_mask)
         return false;
     }
 
-    if (i2c_write_blocking(BOARD_INPUT_I2C_INSTANCE,
-                           BOARD_FOOTSWITCH_EXPANDER_I2C_ADDRESS,
-                           &reg, sizeof(reg), true) != (int)sizeof(reg)) {
+    if (i2c_write_timeout_us(BOARD_INPUT_I2C_INSTANCE,
+                             BOARD_FOOTSWITCH_EXPANDER_I2C_ADDRESS,
+                             &reg, sizeof(reg), true,
+                             BOARD_INPUT_I2C_TIMEOUT_US) != (int)sizeof(reg)) {
         return false;
     }
-    if (i2c_read_blocking(BOARD_INPUT_I2C_INSTANCE,
-                          BOARD_FOOTSWITCH_EXPANDER_I2C_ADDRESS,
-                          &gpio_state, sizeof(gpio_state), false) != (int)sizeof(gpio_state)) {
+    if (i2c_read_timeout_us(BOARD_INPUT_I2C_INSTANCE,
+                            BOARD_FOOTSWITCH_EXPANDER_I2C_ADDRESS,
+                            &gpio_state, sizeof(gpio_state), false,
+                            BOARD_INPUT_I2C_TIMEOUT_US) != (int)sizeof(gpio_state)) {
         return false;
     }
 
